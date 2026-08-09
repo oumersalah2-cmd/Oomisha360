@@ -11,8 +11,10 @@ export default function Navbar() {
 
   const navItems = [
     { name: "Home", href: "/" },
-    { name: "CABI Knowledge Base", href: "/knowledge-base" },
+    { name: "CABI Encyclopedia", href: "/knowledge-base" },
     { name: "B2B Marketplace", href: "/marketplace" },
+    { name: "Analytics Dashboard", href: "/dashboard" },
+    { name: "Cooperative Portal", href: "/portal" },
     { name: "Pitch Deck", href: "/pitch" },
   ];
 

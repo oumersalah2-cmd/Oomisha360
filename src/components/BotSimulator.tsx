@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { diseases, Disease } from "@/data/diseases";
 import { Upload, Play, Pause, RefreshCw, Smartphone, Send, Mic, Languages } from "lucide-react";
+import { useApp } from "@/context/AppContext";
 
 type LangCode = "en" | "am" | "om" | "ar";
 
@@ -14,6 +15,7 @@ const langNames = {
 };
 
 export default function BotSimulator() {
+  const { addDiagnosis } = useApp();
   const [selectedDisease, setSelectedDisease] = useState<Disease>(diseases[0]);
   const [selectedLanguage, setSelectedLanguage] = useState<LangCode>("en");
   const [isDiagnosing, setIsDiagnosing] = useState(false);
@@ -35,6 +37,26 @@ export default function BotSimulator() {
       setSelectedDisease(disease);
       setDiagnosisResult(disease);
       setIsDiagnosing(false);
+      
+      // Log the diagnosis in the shared state
+      const severityMap: Record<string, "low" | "medium" | "high"> = {
+        "coffee-berry-disease": "high",
+        "coffee-leaf-rust": "high",
+        "wheat-stem-rust": "high",
+        "maize-lethal-necrosis": "high",
+        "teff-rust": "medium"
+      };
+      
+      addDiagnosis({
+        crop: disease.crop,
+        diseaseName: disease.name.en,
+        scientificName: disease.scientificName,
+        confidence: disease.confidenceMock || 95,
+        region: disease.crop === "Coffee" ? "Sidama" : "Oromia",
+        woreda: disease.crop === "Coffee" ? "Yirgacheffe" : "Bishoftu",
+        language: langNames[selectedLanguage],
+        severity: severityMap[disease.id] || "medium"
+      });
     }, 1500);
   };
 

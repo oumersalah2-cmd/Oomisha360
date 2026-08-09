@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { marketplaceListings } from "@/data/marketplace";
+import { useApp } from "@/context/AppContext";
 import ListingCard from "@/components/ListingCard";
 import { Search, Filter, ShieldCheck, HelpCircle } from "lucide-react";
 
 export default function Marketplace() {
+  const { listings } = useApp();
   const [selectedCommodity, setSelectedCommodity] = useState("All");
   const [selectedRegion, setSelectedRegion] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -13,7 +14,7 @@ export default function Marketplace() {
   const commodities = ["All", "Specialty Coffee", "Wheat", "White Teff", "Sorghum"];
   const regions = ["All", "Oromia", "Sidama", "SNNPR / Sidama"];
 
-  const filteredListings = marketplaceListings.filter((listing) => {
+  const filteredListings = listings.filter((listing) => {
     const matchesSearch =
       listing.cooperativeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       listing.variety.toLowerCase().includes(searchQuery.toLowerCase()) ||

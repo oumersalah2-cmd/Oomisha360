@@ -157,6 +157,232 @@ export default function PitchDeck() {
           </div>
         </div>
       )
+    },
+    {
+      title: "Market Size & Opportunity: TAM / SAM / SOM",
+      type: "market",
+      content: (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch h-full">
+          {/* Sizing Columns */}
+          <div className="lg:col-span-7 bg-[#0d0d0f]/90 border border-zinc-800/80 rounded-2xl p-6 flex flex-col justify-between">
+            <div>
+              <span className="text-[10px] font-bold text-emerald-green uppercase tracking-wider block mb-1">
+                Vast Uncapped Smallholder Market
+              </span>
+              <h3 className="text-xl font-bold text-white mb-6">
+                Targeting Key Agricultural Producing Zones
+              </h3>
+            </div>
+
+            <div className="space-y-4">
+              {/* TAM */}
+              <div className="bg-charcoal/50 border border-zinc-850 p-3 rounded-xl flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider block font-bold">TAM (Global Smallholders)</span>
+                  <span className="text-sm font-black text-white">$220B+ market cost</span>
+                </div>
+                <span className="text-xs text-zinc-400">600M Smallholders</span>
+              </div>
+              {/* SAM */}
+              <div className="bg-emerald-green/5 border border-emerald-green/20 p-3 rounded-xl flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] text-emerald-green uppercase tracking-wider block font-bold">SAM (Sub-Saharan Africa)</span>
+                  <span className="text-sm font-black text-white">$12.5B addressable trade</span>
+                </div>
+                <span className="text-xs text-emerald-green font-bold">33M Farmers</span>
+              </div>
+              {/* SOM */}
+              <div className="bg-emerald-green/10 border border-emerald-green/30 p-3 rounded-xl flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] text-emerald-green uppercase tracking-wider block font-bold">SOM (Ethiopia Pilot 2026)</span>
+                  <span className="text-sm font-black text-emerald-green">$1.2B cooperative trade</span>
+                </div>
+                <span className="text-xs text-emerald-green font-bold">1.5M Cooperative Members</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-5 flex flex-col justify-between space-y-4">
+            <div className="bg-charcoal border border-zinc-800 p-5 rounded-2xl flex-1">
+              <h4 className="text-xs font-bold text-emerald-green uppercase tracking-wider mb-2">The Wedge Dynamic</h4>
+              <p className="text-xs text-zinc-350 leading-relaxed">
+                By offering free AI crop diagnostics, we map precise yield predictions and quality assessments. This data builds a high-trust wedge to secure exclusive B2B grain and coffee trade routing.
+              </p>
+            </div>
+            <div className="bg-charcoal border border-zinc-800 p-5 rounded-2xl flex justify-between items-center">
+              <div>
+                <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Ethiopia Coffee Value</h4>
+                <p className="text-[10px] text-zinc-500 mt-0.5">Ethiopia's primary export revenue driver</p>
+              </div>
+              <div className="text-xl font-black text-emerald-green tracking-tight shrink-0">$1.4B/yr</div>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "Business Model: Disintermediation Commission",
+      type: "business",
+      content: (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch h-full">
+          {/* Main Content */}
+          <div className="lg:col-span-7 bg-[#0d0d0f]/90 border border-zinc-800/80 rounded-2xl p-6 flex flex-col justify-between">
+            <div>
+              <span className="text-[10px] font-bold text-emerald-green uppercase tracking-wider block mb-1">
+                Sustaining Scale via Fair Commission
+              </span>
+              <h3 className="text-xl font-bold text-white mb-4">
+                How We Make Money Without Taxing Farmers
+              </h3>
+              <p className="text-xs text-zinc-400 leading-relaxed mb-6">
+                Our core diagnostics engine is 100% free for smallholders. We charge food processors, mills, and global buyers a 2-3% transaction facilitation fee on direct marketplace contracts.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="border border-zinc-800 bg-charcoal/50 p-4 rounded-xl">
+                <span className="text-[10px] text-zinc-500 uppercase tracking-wider block font-bold">Traditional Broker Fee</span>
+                <span className="text-lg font-black text-red-500 block mt-1">Up to 40%</span>
+                <span className="text-[9px] text-zinc-550 block">Absorbed by brokers</span>
+              </div>
+              <div className="border border-emerald-green/20 bg-emerald-green/5 p-4 rounded-xl">
+                <span className="text-[10px] text-emerald-green uppercase tracking-wider block font-bold">Gebere Vision Fee</span>
+                <span className="text-lg font-black text-emerald-green block mt-1">2% - 3%</span>
+                <span className="text-[9px] text-emerald-green font-bold block">Charged to buyer</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-5 flex flex-col justify-between space-y-4">
+            <div className="bg-charcoal border border-zinc-800 p-5 rounded-2xl flex-1">
+              <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Premium SaaS Services</h4>
+              <p className="text-xs text-zinc-350 leading-relaxed">
+                Future pricing models include selling advanced analytics reports, disease risk mapping APIs, and satellite verification access to crop insurers and global supply chain audit teams.
+              </p>
+            </div>
+            <div className="bg-charcoal border border-zinc-800 p-5 rounded-2xl flex justify-between items-center">
+              <div>
+                <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Transaction Fee</h4>
+                <p className="text-[10px] text-zinc-500 mt-0.5">Applied exclusively to buyer contracts</p>
+              </div>
+              <div className="text-xl font-black text-emerald-green tracking-tight shrink-0">2.5% avg</div>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "Roadmap: 2026/2027 Strategic Milestones",
+      type: "roadmap",
+      content: (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch h-full">
+          {/* Roadmap visual timeline */}
+          <div className="lg:col-span-7 bg-[#0d0d0f]/90 border border-zinc-800/80 rounded-2xl p-6 flex flex-col justify-between">
+            <div>
+              <span className="text-[10px] font-bold text-emerald-green uppercase tracking-wider block mb-1">
+                Ethiopian Pilot to Global Scale
+              </span>
+              <h3 className="text-xl font-bold text-white mb-6">
+                Milestones Track
+              </h3>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex gap-4 items-start">
+                <span className="bg-emerald-green text-obsidian text-[10px] font-extrabold px-2 py-0.5 rounded shrink-0">Q2 2026</span>
+                <div>
+                  <span className="text-xs font-bold text-white block">Regional Pilot Launch</span>
+                  <span className="text-[10px] text-zinc-450 block">Testing Telegram diagnostic bot with 3 cooperative unions in Oromia.</span>
+                </div>
+              </div>
+              <div className="flex gap-4 items-start border-l border-zinc-800 pl-4">
+                <span className="bg-emerald-green/20 text-emerald-green border border-emerald-green/30 text-[10px] font-bold px-2 py-0.5 rounded shrink-0">Q4 2026</span>
+                <div>
+                  <span className="text-xs font-bold text-zinc-300 block">Marketplace Integration</span>
+                  <span className="text-[10px] text-zinc-500 block">Onboarding 50 cooperative unions and launching verified harvest moisture tests.</span>
+                </div>
+              </div>
+              <div className="flex gap-4 items-start border-l border-zinc-800 pl-4">
+                <span className="bg-zinc-800 text-zinc-450 text-[10px] font-bold px-2 py-0.5 rounded shrink-0">Q2 2027</span>
+                <div>
+                  <span className="text-xs font-bold text-zinc-400 block">Regional Multi-country Expansion</span>
+                  <span className="text-[10px] text-zinc-550 block">Deploying Whisper voice models to Kenya (Swahili) and Uganda.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-5 flex flex-col justify-between space-y-4">
+            <div className="bg-charcoal border border-zinc-800 p-5 rounded-2xl flex-1">
+              <h4 className="text-xs font-bold text-emerald-green uppercase tracking-wider mb-2">Sustainable Scaling</h4>
+              <p className="text-xs text-zinc-355 leading-relaxed">
+                By targeting cooperatives instead of single farmers, we register thousands of active smallholders at once, keeping customer acquisition costs close to zero.
+              </p>
+            </div>
+            <div className="bg-charcoal border border-zinc-800 p-5 rounded-2xl flex justify-between items-center">
+              <div>
+                <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Target Farmers</h4>
+                <p className="text-[10px] text-zinc-500 mt-0.5">Projected smallholder userbase by end of 2027</p>
+              </div>
+              <div className="text-xl font-black text-emerald-green tracking-tight shrink-0">100K+</div>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "Team & Vision: Meet the Founder",
+      type: "team",
+      content: (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch h-full">
+          {/* Team profile */}
+          <div className="lg:col-span-7 bg-[#0d0d0f]/90 border border-zinc-800/80 rounded-2xl p-6 flex flex-col justify-between">
+            <div className="space-y-4">
+              <span className="text-[10px] font-bold text-emerald-green uppercase tracking-wider block">
+                Venture Leadership
+              </span>
+              <h3 className="text-xl font-bold text-white">
+                Fusing Local Context with Applied AI
+              </h3>
+              
+              <div className="flex gap-4 items-center bg-charcoal/50 border border-zinc-850 p-4 rounded-xl mt-4">
+                <div className="h-16 w-16 bg-gradient-to-br from-emerald-green to-muted-emerald rounded-full flex items-center justify-center text-white font-extrabold text-xl shrink-0">
+                  SF
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white">Solo Founder</h4>
+                  <p className="text-xs text-emerald-green font-semibold">Founder & AI Systems Architect</p>
+                  <p className="text-[10px] text-zinc-400 mt-1">Farming roots combined with machine learning specialization. Focused on Whisper voice model local translation and RAG search safety.</p>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-[10px] text-zinc-500 italic mt-4">
+              Advisory board comprises crop agronomists, coffee traders, and cloud developers from international agricultural hubs.
+            </p>
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-5 flex flex-col justify-between space-y-4">
+            <div className="bg-charcoal border border-zinc-800 p-5 rounded-2xl flex-1">
+              <h4 className="text-xs font-bold text-emerald-green uppercase tracking-wider mb-2">Our Mission</h4>
+              <p className="text-xs text-zinc-355 leading-relaxed">
+                To build the core digital utility for smallholders in developing countries, transforming diagnostic crop health data into financial empowerment.
+              </p>
+            </div>
+            <div className="bg-charcoal border border-zinc-800 p-5 rounded-2xl flex justify-between items-center">
+              <div>
+                <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Target Seed Round</h4>
+                <p className="text-[10px] text-zinc-500 mt-0.5">Pre-seed fundraise to expand engineering</p>
+              </div>
+              <div className="text-xl font-black text-emerald-green tracking-tight shrink-0">$500K</div>
+            </div>
+          </div>
+        </div>
+      )
     }
   ];
 
@@ -199,18 +425,18 @@ export default function PitchDeck() {
       </div>
 
       {/* Slides Tab Selector */}
-      <div className="flex gap-2 mb-8 bg-charcoal border border-zinc-850 p-1 rounded-xl w-fit">
+      <div className="flex flex-wrap gap-2 mb-8 bg-charcoal border border-zinc-850 p-1 rounded-xl w-fit">
         {slides.map((slide, idx) => (
           <button
             key={idx}
             onClick={() => setCurrentSlide(idx)}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+            className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${
               currentSlide === idx
                 ? "bg-emerald-green text-obsidian shadow-lg"
                 : "text-zinc-400 hover:text-white"
             }`}
           >
-            Slide {idx + 1}: {slide.type === "problem" ? "The Problem" : "The Solution"}
+            {idx + 1}. {slide.type.charAt(0).toUpperCase() + slide.type.slice(1)}
           </button>
         ))}
       </div>
