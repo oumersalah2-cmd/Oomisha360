@@ -2,6 +2,12 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { MarketplaceListing, marketplaceListings as initialListings } from "@/data/marketplace";
+import { 
+  getListingsAction, 
+  createListingAction, 
+  getDiagnosesAction, 
+  createDiagnosisAction 
+} from "@/app/actions";
 
 export interface DiagnosticHistoryItem {
   id: string;
@@ -93,21 +99,47 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [listings, setListings] = useState<MarketplaceListing[]>(initialListings);
   const [diagnoses, setDiagnoses] = useState<DiagnosticHistoryItem[]>(initialDiagnoses);
 
-  const addListing = (newListingData: Omit<MarketplaceListing, "id">) => {
+  // Load listings and diagnoses from Neon database
+  useEffect(() => {
+    async function loadData() {
+      const dbListings = await getListingsAction();
+      const dbDiagnoses = await getDiagnosesAction();
+      
+      if (dbListings.length > 0) {
+        setListings(dbListings);
+      }
+      if (dbDiagnoses.length > 0) {
+        setDiagnoses(dbDiagnoses);
+      }
+    }
+    loadData();
+  }, []);
+
+  const addListing = async (newListingData: Omit<MarketplaceListing, "id">) => {
+    // Optimistic UI update
+    const tempId = `lst-${Date.now()}`;
     const newListing: MarketplaceListing = {
       ...newListingData,
-      id: `lst-${Date.now()}`
+      id: tempId
     };
     setListings((prev) => [newListing, ...prev]);
+
+    // Save to Neon DB
+    await createListingAction(newListingData);
   };
 
-  const addDiagnosis = (newDiagData: Omit<DiagnosticHistoryItem, "id" | "timestamp">) => {
+  const addDiagnosis = async (newDiagData: Omit<DiagnosticHistoryItem, "id" | "timestamp">) => {
+    // Optimistic UI update
+    const tempId = `diag-${Date.now()}`;
     const newDiag: DiagnosticHistoryItem = {
       ...newDiagData,
-      id: `diag-${Date.now()}`,
+      id: tempId,
       timestamp: new Date().toISOString()
     };
     setDiagnoses((prev) => [newDiag, ...prev]);
+
+    // Save to Neon DB
+    await createDiagnosisAction(newDiagData);
   };
 
   return (
