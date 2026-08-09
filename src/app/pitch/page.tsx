@@ -353,7 +353,7 @@ export default function PitchDeck() {
                   SF
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-white">Solo Founder</h4>
+                  <h4 className="text-sm font-bold text-white">Abdusalam Oumer Aman</h4>
                   <p className="text-xs text-emerald-green font-semibold">Founder & AI Systems Architect</p>
                   <p className="text-[10px] text-zinc-400 mt-1">Farming roots combined with machine learning specialization. Focused on Whisper voice model local translation and RAG search safety.</p>
                 </div>

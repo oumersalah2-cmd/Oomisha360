@@ -90,11 +90,11 @@ export default function Footer() {
             <h3 className="text-zinc-200 font-bold text-sm uppercase tracking-wider mb-2">Contact Info</h3>
             <div className="flex items-center space-x-2 text-sm text-zinc-400">
               <Mail className="h-4 w-4 text-emerald-green" />
-              <span>info@geberevision.ai</span>
+              <span>oumersalah2@gmail.com</span>
             </div>
             <div className="flex items-center space-x-2 text-sm text-zinc-400">
               <Phone className="h-4 w-4 text-emerald-green" />
-              <span>+251 (0) 11 654 3210</span>
+              <span>+251934978247</span>
             </div>
             <div className="flex items-center space-x-2 text-sm text-zinc-400">
               <MapPin className="h-4 w-4 text-emerald-green" />

@@ -190,7 +190,7 @@ export default function Home() {
                 SF
               </div>
               <div>
-                <h4 className="text-base font-bold text-white">Solo Founder</h4>
+                <h4 className="text-base font-bold text-white">Abdusalam Oumer Aman</h4>
                 <p className="text-xs text-emerald-green font-semibold">Founder & AI Architect</p>
               </div>
               <p className="text-xs text-zinc-400 leading-relaxed">
