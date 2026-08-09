@@ -82,6 +82,33 @@ export const marketplaceListings: MarketplaceListing[] = [
     description: "High-protein durum wheat ideal for local millers and pasta manufacturers. Cleaned, graded, and stored in dry, modern silos."
   },
   {
+    id: "lst-west-arsi-wheat",
+    commodityName: "Wheat",
+    variety: "Hasasa Dodole Grade 1 Wheat",
+    cooperativeName: "West Arsi Union (Hasasa Dodole)",
+    location: {
+      region: "Oromia",
+      zone: "West Arsi",
+      woreda: "Hasasa"
+    },
+    volume: {
+      amount: 600,
+      unit: "Quintals"
+    },
+    moistureLevel: 11.2,
+    askingPrice: {
+      amount: 88,
+      currency: "ETB",
+      unit: "kg"
+    },
+    certifications: ["CABI Certified Disease-Free", "Non-GMO"],
+    isVerified: true,
+    harvestYear: 2026,
+    contactPerson: "Kedir Aman",
+    imagePlaceholder: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=800&q=80",
+    description: "Premium bread wheat variety from the highlands of Hasasa Dodole. Exceptionally low moisture content, high gluten structure, and fully cleaned."
+  },
+  {
     id: "lst-white-teff",
     commodityName: "White Teff",
     variety: "Magna (Super White) Teff",
