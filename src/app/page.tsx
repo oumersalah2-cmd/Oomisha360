@@ -13,7 +13,7 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center relative z-10">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-green/10 border border-emerald-green/20 text-emerald-green text-xs font-bold mb-6">
           <span>🌱</span>
-          <span>Empowering Ethiopian Smallholders with Multimodal AI</span>
+          <span>Empowering Farmers in Ethiopia & Beyond with Multimodal AI</span>
         </div>
 
         <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white mb-6 max-w-4xl mx-auto leading-tight">
@@ -58,10 +58,10 @@ export default function Home() {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-xs font-bold text-emerald-green uppercase tracking-wider">The Challenge</span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">
-            The Fragmented African Value Chain
+            The Fragmented Agricultural Value Chain
           </h2>
           <p className="text-zinc-400 text-sm sm:text-base mt-4 leading-relaxed">
-            African agriculture is hindered by lack of expertise and predatory intermediaries. We build trust by solving the immediate agronomic problems first.
+            Agriculture across developing markets is hindered by lack of expertise and predatory intermediaries. We build trust by solving the immediate agronomic problems first.
           </p>
         </div>
 
@@ -70,7 +70,7 @@ export default function Home() {
             <div className="text-3xl font-black text-emerald-green mb-4">30%</div>
             <h3 className="text-lg font-bold text-white mb-2">Annual Crop Loss</h3>
             <p className="text-sm text-zinc-400 leading-relaxed">
-              Ethiopian coffee and wheat farmers lose close to a third of their yield due to lack of timely access to agricultural extension workers.
+              Farmers in developing agricultural hubs lose close to a third of their yield due to lack of timely access to agricultural extension workers.
             </p>
           </div>
 
@@ -98,7 +98,7 @@ export default function Home() {
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="text-xs font-bold text-emerald-green uppercase tracking-wider">Features</span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">
-              Built for Ethiopian Realities
+              Built for Global Realities
             </h2>
             <p className="text-zinc-400 text-sm sm:text-base mt-4">
               A lightweight tech stack optimized for low bandwidth, regional languages, and local oral traditions.
@@ -155,10 +155,10 @@ export default function Home() {
           <div className="lg:col-span-5 space-y-6">
             <span className="text-xs font-bold text-emerald-green uppercase tracking-wider">Our Vision</span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white">
-              Ethiopian Roots & National Scale
+              Ethiopian Roots & Global Scale
             </h2>
             <p className="text-zinc-400 text-sm leading-relaxed">
-              Gebere Vision was founded by Abdusalam Oumer to combine deep local trust with state-of-the-art applied machine learning. We target the most critical cash crop supply chains across the country.
+              Gebere Vision was founded to combine deep local trust with state-of-the-art applied machine learning. We target the most critical cash crop supply chains starting from Ethiopia and scaling beyond.
             </p>
             <div className="space-y-4">
               <div className="flex gap-3">
@@ -167,16 +167,16 @@ export default function Home() {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-white">Ethiopia Pilot (Current)</h4>
-                  <p className="text-xs text-zinc-500">Active piloting in Sidama, Oromia, and Amhara regions.</p>
+                  <p className="text-xs text-zinc-500">Active piloting across coffee and grain producing zones.</p>
                 </div>
               </div>
               <div className="flex gap-3">
                 <div className="h-10 w-10 bg-zinc-800 border border-zinc-700 text-zinc-400 font-bold text-xs flex items-center justify-center rounded-xl shrink-0 mt-1">
-                  ET
+                  GL
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-white">National Scale Expansion (2026/2027)</h4>
-                  <p className="text-xs text-zinc-500">Expanding models to target all key grain, oilseed, and coffee producing zones in Ethiopia.</p>
+                  <h4 className="text-sm font-bold text-white">Global Scale Expansion (2026/2027)</h4>
+                  <p className="text-xs text-zinc-500">Expanding models to target key agricultural producing zones globally.</p>
                 </div>
               </div>
             </div>
@@ -187,14 +187,14 @@ export default function Home() {
             <div className="bg-charcoal border border-zinc-800 p-8 rounded-3xl text-center space-y-4 max-w-sm w-full relative overflow-hidden">
               <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-emerald-green/15 to-transparent rounded-bl-full pointer-events-none" />
               <div className="h-20 w-20 bg-gradient-to-br from-emerald-green to-muted-emerald rounded-full mx-auto flex items-center justify-center text-white font-extrabold text-2xl shadow-lg shadow-emerald-green/15">
-                AO
+                SF
               </div>
               <div>
-                <h4 className="text-base font-bold text-white">Abdusalam Oumer</h4>
+                <h4 className="text-base font-bold text-white">Solo Founder</h4>
                 <p className="text-xs text-emerald-green font-semibold">Founder & AI Architect</p>
               </div>
               <p className="text-xs text-zinc-400 leading-relaxed">
-                Ex-Google Africa ML Fellow, specializing in localized Whisper speech models and agricultural computer vision diagnostics for local Ethiopian contexts.
+                Building next-generation agricultural computer vision diagnostics and Whisper-powered localized speech models to democratize agronomic expertise.
               </p>
             </div>
           </div>

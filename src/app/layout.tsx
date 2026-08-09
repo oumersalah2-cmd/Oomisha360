@@ -11,7 +11,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Gebere Vision AI — Digital Agronomist & Fair-Trade Produce Marketplace",
-  description: "AI-powered crop disease diagnosis in Ethiopian languages and broker-free agricultural B2B commerce for smallholder farmers.",
+  description: "AI-powered crop disease diagnosis in English, Amharic, Afaan Oromo, and Arabic for farmers in Ethiopia and beyond.",
 };
 
 export default function RootLayout({

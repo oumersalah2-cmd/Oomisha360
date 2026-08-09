@@ -43,7 +43,7 @@ export default function Marketplace() {
             B2B Produce Marketplace
           </h1>
           <p className="text-zinc-400 text-sm sm:text-base mt-2 leading-relaxed">
-            Connecting verified Ethiopian agricultural cooperative unions directly with food processors, grain millers, and global coffee exporters. Built to eliminate predatory intermediary fees.
+            Connecting verified agricultural cooperative unions in Ethiopia and beyond directly with food processors, grain millers, and global coffee exporters. Built to eliminate predatory intermediary fees.
           </p>
         </div>
 

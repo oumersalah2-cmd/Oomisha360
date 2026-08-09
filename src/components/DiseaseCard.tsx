@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Disease } from "@/data/diseases";
-import { Check, Shield, AlertTriangle, Languages, Activity } from "lucide-react";
+import { Check, Shield, AlertTriangle, Activity, Play, Pause } from "lucide-react";
 
 interface DiseaseCardProps {
   disease: Disease;
@@ -14,12 +14,57 @@ export default function DiseaseCard({ disease }: DiseaseCardProps) {
   const [lang, setLang] = useState<LangCode>("en");
   const [guideTab, setGuideTab] = useState<"organic" | "chemical">("organic");
 
+  // Audio simulation state
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioProgress, setAudioProgress] = useState(0);
+  const audioIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
   const languages: { code: LangCode; label: string }[] = [
     { code: "en", label: "EN" },
     { code: "am", label: "አማ" },
     { code: "om", label: "ORM" },
     { code: "ar", label: "عرب" }
   ];
+
+  // Stop audio if tab or language changes
+  useEffect(() => {
+    if (audioIntervalRef.current) {
+      clearInterval(audioIntervalRef.current);
+    }
+    setIsPlaying(false);
+    setAudioProgress(0);
+  }, [lang, guideTab]);
+
+  useEffect(() => {
+    return () => {
+      if (audioIntervalRef.current) {
+        clearInterval(audioIntervalRef.current);
+      }
+    };
+  }, []);
+
+  const togglePlay = () => {
+    if (isPlaying) {
+      if (audioIntervalRef.current) {
+        clearInterval(audioIntervalRef.current);
+      }
+      setIsPlaying(false);
+    } else {
+      setIsPlaying(true);
+      audioIntervalRef.current = setInterval(() => {
+        setAudioProgress((prev) => {
+          if (prev >= 100) {
+            if (audioIntervalRef.current) {
+              clearInterval(audioIntervalRef.current);
+            }
+            setIsPlaying(false);
+            return 0;
+          }
+          return prev + 4;
+        });
+      }, 100);
+    }
+  };
 
   return (
     <div className="rounded-2xl border border-emerald-green/10 bg-charcoal p-6 transition-all duration-300 hover:border-emerald-green/20 hover:shadow-lg hover:shadow-emerald-green/5 relative overflow-hidden flex flex-col justify-between">
@@ -41,7 +86,7 @@ export default function DiseaseCard({ disease }: DiseaseCardProps) {
             </p>
           </div>
 
-          <div className="flex bg-obsidian border border-zinc-800 p-0.5 rounded-lg">
+          <div className="flex bg-obsidian border border-zinc-800 p-0.5 rounded-lg shrink-0">
             {languages.map((l) => (
               <button
                 key={l.code}
@@ -103,7 +148,7 @@ export default function DiseaseCard({ disease }: DiseaseCardProps) {
         </div>
 
         {/* Action Guide Content */}
-        <div className="bg-obsidian border border-zinc-800/80 rounded-xl p-3.5">
+        <div className="bg-obsidian border border-zinc-800/80 rounded-xl p-3.5 space-y-3">
           {guideTab === "organic" ? (
             <div>
               <span className="text-[10px] font-bold text-emerald-green uppercase tracking-wider block mb-1">
@@ -121,6 +166,54 @@ export default function DiseaseCard({ disease }: DiseaseCardProps) {
               <p className="text-xs text-zinc-300 leading-relaxed">
                 {disease.chemicalTreatments[lang]}
               </p>
+            </div>
+          )}
+
+          {/* Voice Player */}
+          {disease.audioDuration && (
+            <div className="bg-charcoal/50 border border-zinc-800/60 rounded-lg p-2.5 flex items-center gap-2.5 mt-2">
+              <button
+                onClick={togglePlay}
+                className={`h-7 w-7 rounded-full flex items-center justify-center shrink-0 transition-all ${
+                  guideTab === "organic"
+                    ? "bg-emerald-green text-obsidian hover:bg-emerald-green/90"
+                    : "bg-yellow-500 text-obsidian hover:bg-yellow-500/90"
+                }`}
+              >
+                {isPlaying ? (
+                  <Pause className="h-3.5 w-3.5" />
+                ) : (
+                  <Play className="h-3.5 w-3.5 fill-obsidian ml-0.5" />
+                )}
+              </button>
+              <div className="flex-1 min-w-0">
+                <span className="text-[9px] font-bold text-zinc-500 block leading-none mb-1">
+                  Remedy Voice Note ({languages.find((l) => l.code === lang)?.label})
+                </span>
+                {/* Waveform */}
+                <div className="h-3 flex items-center gap-0.5">
+                  {Array.from({ length: 18 }).map((_, idx) => {
+                    const waveHeight = 2 + Math.abs(Math.sin(idx + audioProgress)) * 8;
+                    const isPast = (idx / 18) * 100 <= audioProgress;
+                    return (
+                      <div
+                        key={idx}
+                        style={{ height: `${waveHeight}px` }}
+                        className={`w-[1.5px] rounded-full transition-all duration-100 ${
+                          isPast
+                            ? guideTab === "organic"
+                              ? "bg-emerald-green"
+                              : "bg-yellow-500"
+                            : "bg-zinc-850"
+                        }`}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+              <span className="text-[9px] text-zinc-500 shrink-0 font-mono">
+                {disease.audioDuration}
+              </span>
             </div>
           )}
         </div>

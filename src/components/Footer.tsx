@@ -19,7 +19,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-sm text-zinc-400 leading-relaxed">
-              Empowering Ethiopian smallholder farmers with multimodal AI crop disease diagnosis and direct B2B produce markets.
+              Empowering smallholder farmers in Ethiopia and beyond with multimodal AI crop disease diagnosis and direct B2B produce markets.
             </p>
           </div>
 
@@ -98,7 +98,7 @@ export default function Footer() {
             </div>
             <div className="flex items-center space-x-2 text-sm text-zinc-400">
               <MapPin className="h-4 w-4 text-emerald-green" />
-              <span>Addis Ababa, Ethiopia</span>
+              <span>Ethiopia & Beyond</span>
             </div>
           </div>
         </div>
