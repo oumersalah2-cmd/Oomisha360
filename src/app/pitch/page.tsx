@@ -38,8 +38,8 @@ export default function PitchDeck() {
           </div>
           <h3 className="text-base font-bold text-white">Market Size (TAM)</h3>
           <p className="text-xs text-zinc-400 leading-relaxed">
-            <strong>TAM:</strong> $450B Pan-African agricultural market.<br />
-            <strong>SAM:</strong> $12B Ethiopian cash crops export (Specialty Coffee, Oilseeds, Teff).<br />
+            <strong>TAM:</strong> $12B+ Ethiopian cash crops and grain market opportunity.<br />
+            <strong>SAM:</strong> $4.2B targeted cooperative union transactions (Specialty Coffee, Oilseeds, Teff).<br />
             <strong>SOM:</strong> $240M cooperative-sourced grain and coffee exports transacted through direct fair-trade networks.
           </p>
         </div>

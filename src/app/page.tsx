@@ -13,7 +13,7 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center relative z-10">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-green/10 border border-emerald-green/20 text-emerald-green text-xs font-bold mb-6">
           <span>🌱</span>
-          <span>Empowering African Smallholders with Multimodal AI</span>
+          <span>Empowering Ethiopian Smallholders with Multimodal AI</span>
         </div>
 
         <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white mb-6 max-w-4xl mx-auto leading-tight">
@@ -98,10 +98,10 @@ export default function Home() {
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="text-xs font-bold text-emerald-green uppercase tracking-wider">Features</span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">
-              Built for Pan-African Realities
+              Built for Ethiopian Realities
             </h2>
             <p className="text-zinc-400 text-sm sm:text-base mt-4">
-              A lightweight tech stack optimized for low bandwidth, rural deployment, and local oral traditions.
+              A lightweight tech stack optimized for low bandwidth, regional languages, and local oral traditions.
             </p>
           </div>
 
@@ -149,16 +149,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Founding Team & Pan-African Expansion */}
+      {/* Founder & National Scale */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-5 space-y-6">
-            <span className="text-xs font-bold text-emerald-green uppercase tracking-wider">Our Team & Vision</span>
+            <span className="text-xs font-bold text-emerald-green uppercase tracking-wider">Our Vision</span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white">
-              Pan-African Scale & Deep Local Roots
+              Ethiopian Roots & National Scale
             </h2>
             <p className="text-zinc-400 text-sm leading-relaxed">
-              Gebere Vision was founded by developers, agronomists, and supply chain specialists from the Horn of Africa. We combine deep local trust with state-of-the-art applied machine learning.
+              Gebere Vision was founded by Abdusalam Oumer to combine deep local trust with state-of-the-art applied machine learning. We target the most critical cash crop supply chains across the country.
             </p>
             <div className="space-y-4">
               <div className="flex gap-3">
@@ -166,62 +166,35 @@ export default function Home() {
                   ET
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-white">Ethiopia Hub (Current)</h4>
+                  <h4 className="text-sm font-bold text-white">Ethiopia Pilot (Current)</h4>
                   <p className="text-xs text-zinc-500">Active piloting in Sidama, Oromia, and Amhara regions.</p>
                 </div>
               </div>
               <div className="flex gap-3">
                 <div className="h-10 w-10 bg-zinc-800 border border-zinc-700 text-zinc-400 font-bold text-xs flex items-center justify-center rounded-xl shrink-0 mt-1">
-                  EA
+                  ET
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-white">East & North Africa Roadmap (2026/2027)</h4>
-                  <p className="text-xs text-zinc-500">Expanding models to target cash crops in Kenya, Egypt, Morocco, Nigeria, and Ghana.</p>
+                  <h4 className="text-sm font-bold text-white">National Scale Expansion (2026/2027)</h4>
+                  <p className="text-xs text-zinc-500">Expanding models to target all key grain, oilseed, and coffee producing zones in Ethiopia.</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {/* Team member 1 */}
-            <div className="bg-charcoal border border-zinc-800 p-6 rounded-2xl text-center space-y-3">
-              <div className="h-16 w-16 bg-gradient-to-br from-emerald-green to-muted-emerald rounded-full mx-auto flex items-center justify-center text-white font-extrabold text-lg">
+          <div className="lg:col-span-7 flex justify-center">
+            {/* Solo Founder Card */}
+            <div className="bg-charcoal border border-zinc-800 p-8 rounded-3xl text-center space-y-4 max-w-sm w-full relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-emerald-green/15 to-transparent rounded-bl-full pointer-events-none" />
+              <div className="h-20 w-20 bg-gradient-to-br from-emerald-green to-muted-emerald rounded-full mx-auto flex items-center justify-center text-white font-extrabold text-2xl shadow-lg shadow-emerald-green/15">
                 AO
               </div>
               <div>
-                <h4 className="text-sm font-bold text-white">Abdusalam Oumer</h4>
-                <p className="text-[10px] text-emerald-green font-medium">Co-Founder & AI Lead</p>
+                <h4 className="text-base font-bold text-white">Abdusalam Oumer</h4>
+                <p className="text-xs text-emerald-green font-semibold">Founder & AI Architect</p>
               </div>
-              <p className="text-[11px] text-zinc-400 leading-relaxed">
-                Ex-Google Africa ML Fellow, specializing in localized Whisper speech models and agricultural vision.
-              </p>
-            </div>
-
-            {/* Team member 2 */}
-            <div className="bg-charcoal border border-zinc-800 p-6 rounded-2xl text-center space-y-3">
-              <div className="h-16 w-16 bg-gradient-to-br from-emerald-green to-muted-emerald rounded-full mx-auto flex items-center justify-center text-white font-extrabold text-lg">
-                MH
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-white">Makako Hamu</h4>
-                <p className="text-[10px] text-emerald-green font-medium">Agronomic Director</p>
-              </div>
-              <p className="text-[11px] text-zinc-400 leading-relaxed">
-                Ph.D. in Crop Science from Haramaya University, ex-CABI Regional Extension Lead.
-              </p>
-            </div>
-
-            {/* Team member 3 */}
-            <div className="bg-charcoal border border-zinc-800 p-6 rounded-2xl text-center space-y-3">
-              <div className="h-16 w-16 bg-gradient-to-br from-emerald-green to-muted-emerald rounded-full mx-auto flex items-center justify-center text-white font-extrabold text-lg">
-                EA
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-white">Ekram Ahmed</h4>
-                <p className="text-[10px] text-emerald-green font-medium">Operations & B2B</p>
-              </div>
-              <p className="text-[11px] text-zinc-400 leading-relaxed">
-                Ex-Commodity Exchange (ECX) Specialist, managing fair-trade exporter contracts.
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                Ex-Google Africa ML Fellow, specializing in localized Whisper speech models and agricultural computer vision diagnostics for local Ethiopian contexts.
               </p>
             </div>
           </div>

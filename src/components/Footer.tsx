@@ -19,7 +19,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-sm text-zinc-400 leading-relaxed">
-              Empowering Pan-African smallholder farmers with multimodal AI disease diagnosis and direct B2B produce markets.
+              Empowering Ethiopian smallholder farmers with multimodal AI crop disease diagnosis and direct B2B produce markets.
             </p>
           </div>
 
