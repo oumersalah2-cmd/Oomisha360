@@ -33,12 +33,18 @@ export default function DiseaseCard({ disease }: DiseaseCardProps) {
     }
     setIsPlaying(false);
     setAudioProgress(0);
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
   }, [lang, guideTab]);
 
   useEffect(() => {
     return () => {
       if (audioIntervalRef.current) {
         clearInterval(audioIntervalRef.current);
+      }
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
       }
     };
   }, []);
@@ -49,16 +55,62 @@ export default function DiseaseCard({ disease }: DiseaseCardProps) {
         clearInterval(audioIntervalRef.current);
       }
       setIsPlaying(false);
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
     } else {
       setIsPlaying(true);
+      
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+        
+        const textToSpeak = guideTab === "organic" 
+          ? disease.organicRemedies[lang] 
+          : disease.chemicalTreatments[lang];
+          
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        
+        // Find best voice match for active language
+        const voices = window.speechSynthesis.getVoices();
+        let voice = null;
+        if (lang === "en") {
+          voice = voices.find(v => v.lang.startsWith("en")) || null;
+        } else if (lang === "ar") {
+          voice = voices.find(v => v.lang.startsWith("ar")) || null;
+        } else if (lang === "am") {
+          voice = voices.find(v => v.lang.startsWith("am") || v.lang.startsWith("eth")) || null;
+        } else if (lang === "om") {
+          voice = voices.find(v => v.lang.startsWith("om")) || null;
+        }
+        
+        if (voice) {
+          utterance.voice = voice;
+        }
+        utterance.lang = lang === "am" ? "am-ET" : lang === "ar" ? "ar-SA" : lang === "om" ? "om-ET" : "en-US";
+        
+        utterance.onend = () => {
+          setIsPlaying(false);
+          setAudioProgress(0);
+          if (audioIntervalRef.current) {
+            clearInterval(audioIntervalRef.current);
+          }
+        };
+        
+        utterance.onerror = () => {
+          setIsPlaying(false);
+          setAudioProgress(0);
+          if (audioIntervalRef.current) {
+            clearInterval(audioIntervalRef.current);
+          }
+        };
+        
+        window.speechSynthesis.speak(utterance);
+      }
+      
       audioIntervalRef.current = setInterval(() => {
         setAudioProgress((prev) => {
           if (prev >= 100) {
-            if (audioIntervalRef.current) {
-              clearInterval(audioIntervalRef.current);
-            }
-            setIsPlaying(false);
-            return 0;
+            return 0; // Loop progress animation visually until audio finishes
           }
           return prev + 4;
         });

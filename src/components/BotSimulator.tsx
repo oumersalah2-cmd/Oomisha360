@@ -32,6 +32,9 @@ export default function BotSimulator() {
     setDiagnosisResult(null);
     setIsPlaying(false);
     setAudioProgress(0);
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
 
     setTimeout(() => {
       setSelectedDisease(disease);
@@ -60,19 +63,70 @@ export default function BotSimulator() {
     }, 1500);
   };
 
-  // Simulated audio player
+  // Stop audio if language changes
+  useEffect(() => {
+    if (audioIntervalRef.current) clearInterval(audioIntervalRef.current);
+    setIsPlaying(false);
+    setAudioProgress(0);
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+  }, [selectedLanguage]);
+
+  // Simulated audio player with real speech synthesis
   const togglePlay = () => {
     if (isPlaying) {
       if (audioIntervalRef.current) clearInterval(audioIntervalRef.current);
       setIsPlaying(false);
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
     } else {
       setIsPlaying(true);
+      
+      if (typeof window !== "undefined" && window.speechSynthesis && diagnosisResult) {
+        window.speechSynthesis.cancel();
+        
+        const textToSpeak = diagnosisResult.organicRemedies[selectedLanguage];
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        
+        // Find best voice match for selected language
+        const voices = window.speechSynthesis.getVoices();
+        let voice = null;
+        if (selectedLanguage === "en") {
+          voice = voices.find(v => v.lang.startsWith("en")) || null;
+        } else if (selectedLanguage === "ar") {
+          voice = voices.find(v => v.lang.startsWith("ar")) || null;
+        } else if (selectedLanguage === "am") {
+          voice = voices.find(v => v.lang.startsWith("am") || v.lang.startsWith("eth")) || null;
+        } else if (selectedLanguage === "om") {
+          voice = voices.find(v => v.lang.startsWith("om")) || null;
+        }
+        
+        if (voice) {
+          utterance.voice = voice;
+        }
+        utterance.lang = selectedLanguage === "am" ? "am-ET" : selectedLanguage === "ar" ? "ar-SA" : selectedLanguage === "om" ? "om-ET" : "en-US";
+        
+        utterance.onend = () => {
+          setIsPlaying(false);
+          setAudioProgress(0);
+          if (audioIntervalRef.current) clearInterval(audioIntervalRef.current);
+        };
+        
+        utterance.onerror = () => {
+          setIsPlaying(false);
+          setAudioProgress(0);
+          if (audioIntervalRef.current) clearInterval(audioIntervalRef.current);
+        };
+        
+        window.speechSynthesis.speak(utterance);
+      }
+      
       audioIntervalRef.current = setInterval(() => {
         setAudioProgress((prev) => {
           if (prev >= 100) {
-            clearInterval(audioIntervalRef.current!);
-            setIsPlaying(false);
-            return 0;
+            return 0; // Loop progress animation visually until audio finishes
           }
           return prev + 2.5;
         });
@@ -83,6 +137,9 @@ export default function BotSimulator() {
   useEffect(() => {
     return () => {
       if (audioIntervalRef.current) clearInterval(audioIntervalRef.current);
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
     };
   }, []);
 
