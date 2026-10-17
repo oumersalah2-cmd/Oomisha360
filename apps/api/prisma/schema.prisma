@@ -1,0 +1,202 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model UserProfile {
+  id              String               @id // Matches Supabase Auth User ID
+  email           String               @unique
+  fullName        String
+  phoneNumber     String?
+  region          String?
+  zone            String?
+  woreda          String?
+  cooperativeName String?
+  role            String               @default("farmer") // farmer, cooperative_manager, buyer, agronomist
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  farms           Farm[]
+  landRecords     LandRecord[]
+  expenses        Expense[]
+  harvests        Harvest[]
+  listings        MarketplaceListing[]
+
+  @@map("user_profiles")
+}
+
+model Farm {
+  id            String        @id @default(uuid())
+  userId        String
+  name          String
+  region        String
+  zone          String?
+  woreda        String?
+  kebele        String?
+  soilType      String?
+  totalHectares Float
+  primaryCrop   String?
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  user          UserProfile   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  landRecords   LandRecord[]
+  expenses      Expense[]
+  harvests      Harvest[]
+
+  @@index([userId])
+  @@map("farms")
+}
+
+model LandRecord {
+  id                String       @id @default(uuid())
+  userId            String
+  farmId            String?
+  plotName          String
+  crop              String?
+  calculationMethod String       // rectangular or polygon
+  length            Float?
+  width             Float?
+  lengthUnit        String?      // meters, kilometers, feet
+  widthUnit         String?
+  coordinatesJson   String?      // GeoJSON polygon coordinates string
+  areaSquareMeters  Float
+  areaHectares      Float
+  areaAcres         Float
+  isEstimate        Boolean      @default(false)
+  notes             String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  user              UserProfile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  farm              Farm?        @relation(fields: [farmId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([farmId])
+  @@map("land_records")
+}
+
+model Expense {
+  id          String       @id @default(uuid())
+  userId      String
+  farmId      String
+  season      String
+  category    String       // land_preparation, seeds, fertilizer, etc.
+  description String
+  amount      Float
+  currency    String       @default("ETB")
+  date        DateTime     @default(now())
+  receiptUrl  String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  user        UserProfile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  farm        Farm         @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([farmId])
+  @@index([season])
+  @@map("expenses")
+}
+
+model Harvest {
+  id                 String       @id @default(uuid())
+  userId             String
+  farmId             String
+  crop               String
+  season             String
+  harvestDate        DateTime     @default(now())
+  quantity           Float
+  unit               String       // Quintals, Metric Tons, kg, Bags
+  sellingPricePerUnit Float
+  currency           String       @default("ETB")
+  buyerName          String?
+  notes              String?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  user               UserProfile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  farm               Farm         @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([farmId])
+  @@index([season])
+  @@map("harvests")
+}
+
+model MarketplaceListing {
+  id                String               @id @default(uuid())
+  sellerId          String
+  commodityName     String
+  variety           String
+  category          String               // cereals_grains, coffee_spices, etc.
+  description       String
+  volumeAmount      Float
+  volumeUnit        String               // Quintals, Metric Tons, kg, Bags
+  moistureLevel     Float?
+  askingPriceAmount Float
+  priceUnit         String               // kg, Quintal, Metric Ton
+  currency          String               @default("ETB")
+  region            String
+  zone              String
+  woreda            String
+  cooperativeName   String?
+  contactPerson     String
+  contactPhone      String
+  contactEmail      String?
+  certifications    String[]             @default([])
+  status            String               @default("active") // active, draft, sold
+  isVerified        Boolean              @default(false)
+  harvestYear       Int
+  imageUrls         String[]             @default([])
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  seller            UserProfile          @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  inquiries         MarketplaceInquiry[]
+
+  @@index([sellerId])
+  @@index([category])
+  @@index([status])
+  @@index([region])
+  @@map("marketplace_listings")
+}
+
+model MarketplaceInquiry {
+  id           String             @id @default(uuid())
+  listingId    String
+  senderId     String?
+  senderName   String
+  senderPhone  String
+  senderEmail  String?
+  message      String
+  offeredPrice Float?
+  status       String             @default("pending") // pending, read, responded
+  createdAt    DateTime           @default(now())
+
+  listing      MarketplaceListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+  @@map("marketplace_inquiries")
+}
+
+model CropDiagnosisLog {
+  id                String    @id @default(uuid())
+  source            String    @default("telegram_bot")
+  farmerTelegramId  String?
+  crop              String
+  symptoms          String?
+  diseaseIdentified String?
+  confidence        Float?
+  region            String?
+  language          String?
+  status            String    @default("synced_from_bot")
+  createdAt         DateTime  @default(now())
+
+  @@map("crop_diagnosis_logs")
+}

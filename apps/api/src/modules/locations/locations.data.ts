@@ -1,0 +1,738 @@
+import { RegionLocationData, EthiopiaRegionSummary } from '@gebere/shared';
+
+export const ETHIOPIA_REGIONS_CATALOGUE: EthiopiaRegionSummary[] = [
+  {
+    id: 'oromia',
+    name: 'Oromia',
+    country: 'Ethiopia',
+    zoneCount: 16,
+    primaryAgriculturalZones: ['Jimma', 'Bale', 'West Arsi', 'Arsi', 'East Shewa', 'West Shewa', 'Guji', 'Hararghe'],
+  },
+  {
+    id: 'amhara',
+    name: 'Amhara',
+    country: 'Ethiopia',
+    zoneCount: 11,
+    primaryAgriculturalZones: ['East Gojjam', 'West Gojjam', 'South Gondar', 'North Shewa', 'Awi'],
+  },
+  {
+    id: 'sidama',
+    name: 'Sidama',
+    country: 'Ethiopia',
+    zoneCount: 4,
+    primaryAgriculturalZones: ['Dale', 'Aleta Wondo', 'Shebedino', 'Wondo Genet', 'Hula'],
+  },
+  {
+    id: 'south_ethiopia',
+    name: 'South Ethiopia Regional State',
+    country: 'Ethiopia',
+    zoneCount: 7,
+    primaryAgriculturalZones: ['Gamo', 'Gofa', 'Wolaita', 'Gedeo (Yirgacheffe)', 'Konso', 'South Omo'],
+  },
+  {
+    id: 'central_ethiopia',
+    name: 'Central Ethiopia Regional State',
+    country: 'Ethiopia',
+    zoneCount: 5,
+    primaryAgriculturalZones: ['Gurage', 'Silte', 'Hadiya', 'Kembata Tembaro', 'Halaba'],
+  },
+  {
+    id: 'southwest_ethiopia',
+    name: 'Southwest Ethiopia Peoples\' Region',
+    country: 'Ethiopia',
+    zoneCount: 6,
+    primaryAgriculturalZones: ['Keffa (Origin of Coffee)', 'Sheka', 'Bench Sheko', 'Dawro'],
+  },
+  {
+    id: 'tigray',
+    name: 'Tigray',
+    country: 'Ethiopia',
+    zoneCount: 6,
+    primaryAgriculturalZones: ['Southern Tigray', 'Central Tigray', 'Eastern Tigray', 'North Western Tigray'],
+  },
+  {
+    id: 'somali',
+    name: 'Somali',
+    country: 'Ethiopia',
+    zoneCount: 8,
+    primaryAgriculturalZones: ['Fafan (Jijiga)', 'Siti', 'Shabelle', 'Afder', 'Liban'],
+  },
+  {
+    id: 'afar',
+    name: 'Afar',
+    country: 'Ethiopia',
+    zoneCount: 5,
+    primaryAgriculturalZones: ['Awsi Rasu (Zone 1)', 'Gabi Rasu (Zone 3 - Awash Basin)', 'Kilbet Rasu'],
+  },
+  {
+    id: 'benishangul_gumuz',
+    name: 'Benishangul-Gumuz',
+    country: 'Ethiopia',
+    zoneCount: 4,
+    primaryAgriculturalZones: ['Metekel (Grand Renaissance Agricultural Basin)', 'Asosa', 'Kamashi'],
+  },
+  {
+    id: 'gambela',
+    name: 'Gambela',
+    country: 'Ethiopia',
+    zoneCount: 3,
+    primaryAgriculturalZones: ['Anuak (Agnewak)', 'Nuer', 'Majang (Forest Honey & Spices)'],
+  },
+  {
+    id: 'harari',
+    name: 'Harari',
+    country: 'Ethiopia',
+    zoneCount: 2,
+    primaryAgriculturalZones: ['Harar Urban Agricultural Basin', 'Sofi', 'Erer Rural'],
+  },
+  {
+    id: 'dire_dawa',
+    name: 'Dire Dawa Administration',
+    country: 'Ethiopia',
+    zoneCount: 2,
+    primaryAgriculturalZones: ['Dire Dawa Peri-Urban', 'Gurgura Rural District'],
+  },
+  {
+    id: 'addis_ababa',
+    name: 'Addis Ababa Administration',
+    country: 'Ethiopia',
+    zoneCount: 3,
+    primaryAgriculturalZones: ['Akaki-Kality Urban Ag', 'Bole Peri-Urban', 'Yeka Peri-Urban'],
+  },
+];
+
+export const ALL_ETHIOPIA_LOCATIONS: Record<string, RegionLocationData> = {
+  oromia: {
+    region: 'Oromia',
+    country: 'Ethiopia',
+    zones: [
+      {
+        id: 'jimma',
+        name: 'Jimma',
+        primaryCrops: ['Coffee', 'Maize', 'Teff', 'Honey'],
+        woredas: [
+          { id: 'jimma_city', name: 'Jimma City' },
+          { id: 'mana', name: 'Mana' },
+          { id: 'gomma', name: 'Gomma' },
+          { id: 'limmu_kosa', name: 'Limmu Kosa' },
+          { id: 'limmu_seka', name: 'Limmu Seka' },
+          { id: 'kersa_jimma', name: 'Kersa' },
+          { id: 'seka_chekorsa', name: 'Seka Chekorsa' },
+          { id: 'dedo', name: 'Dedo' },
+          { id: 'gera', name: 'Gera' },
+          { id: 'shebe_senbo', name: 'Shebe Senbo' },
+          { id: 'omo_nada', name: 'Omo Nada' },
+          { id: 'chora_botor', name: 'Chora Botor' },
+        ],
+      },
+      {
+        id: 'bale',
+        name: 'Bale',
+        primaryCrops: ['Wheat', 'Barley', 'Teff', 'Pulses'],
+        woredas: [
+          { id: 'goba', name: 'Goba' },
+          { id: 'robe_bale', name: 'Robe' },
+          { id: 'sinana', name: 'Sinana (Durum Wheat Center)' },
+          { id: 'dinsho', name: 'Dinsho' },
+          { id: 'agarfa', name: 'Agarfa' },
+          { id: 'gassera', name: 'Gassera' },
+          { id: 'gololcha_bale', name: 'Gololcha' },
+          { id: 'goro_bale', name: 'Goro' },
+          { id: 'berbere', name: 'Berbere' },
+          { id: 'ginir', name: 'Ginir' },
+          { id: 'dawe_serer', name: 'Dawe Serer' },
+        ],
+      },
+      {
+        id: 'west_arsi',
+        name: 'West Arsi',
+        primaryCrops: ['Wheat', 'Barley', 'Coffee', 'Teff', 'Potato'],
+        woredas: [
+          { id: 'shashamane', name: 'Shashamane' },
+          { id: 'arsi_negele', name: 'Arsi Negele' },
+          { id: 'kofele', name: 'Kofele' },
+          { id: 'dodola', name: 'Dodola' },
+          { id: 'adaba', name: 'Adaba' },
+          { id: 'nensebo', name: 'Nensebo (Highland Specialty Coffee)' },
+          { id: 'kokosa', name: 'Kokosa' },
+          { id: 'gedeb_asasa', name: 'Gedeb Asasa' },
+          { id: 'heban_arsi', name: 'Heban Arsi' },
+          { id: 'shala', name: 'Shala' },
+        ],
+      },
+      {
+        id: 'arsi',
+        name: 'Arsi',
+        primaryCrops: ['Wheat', 'Barley', 'Teff', 'Faba Beans'],
+        woredas: [
+          { id: 'asella', name: 'Asella' },
+          { id: 'tiyo', name: 'Tiyo' },
+          { id: 'hitosa', name: 'Hitosa' },
+          { id: 'lemu_bilbilo', name: 'Lemu Bilbilo' },
+          { id: 'digelu_tijo', name: 'Digelu Tijo' },
+          { id: 'sire', name: 'Sire' },
+          { id: 'merti', name: 'Merti' },
+          { id: 'shirka', name: 'Shirka' },
+          { id: 'honkolo_wabe', name: 'Honkolo Wabe' },
+          { id: 'jeju', name: 'Jeju' },
+          { id: 'ziway_dugda', name: 'Ziway Dugda' },
+        ],
+      },
+      {
+        id: 'east_shewa',
+        name: 'East Shewa',
+        primaryCrops: ['Teff (Magna)', 'Chickpeas', 'Wheat', 'Maize'],
+        woredas: [
+          { id: 'bishoftu', name: 'Bishoftu (Ada\'a Agricultural Hub)' },
+          { id: 'adama', name: 'Adama' },
+          { id: 'boset', name: 'Boset' },
+          { id: 'lume', name: 'Lume' },
+          { id: 'dugda', name: 'Dugda' },
+          { id: 'bora', name: 'Bora' },
+          { id: 'gimbichu', name: 'Gimbichu' },
+          { id: 'liben_chukala', name: 'Liben Chukala' },
+        ],
+      },
+      {
+        id: 'west_shewa',
+        name: 'West Shewa',
+        primaryCrops: ['Teff', 'Wheat', 'Barley', 'Maize'],
+        woredas: [
+          { id: 'ambo', name: 'Ambo' },
+          { id: 'dendi', name: 'Dendi' },
+          { id: 'jeldu', name: 'Jeldu' },
+          { id: 'tikur_enchini', name: 'Tikur Enchini' },
+          { id: 'bako_tibe', name: 'Bako Tibe' },
+          { id: 'cheliya', name: 'Cheliya' },
+          { id: 'ejere', name: 'Ejere' },
+          { id: 'meta_robi', name: 'Meta Robi' },
+        ],
+      },
+      {
+        id: 'southwest_shewa',
+        name: 'Southwest Shewa',
+        primaryCrops: ['Teff', 'Wheat', 'Enset'],
+        woredas: [
+          { id: 'waliso', name: 'Waliso' },
+          { id: 'becho', name: 'Becho' },
+          { id: 'dawo', name: 'Dawo' },
+          { id: 'seden_sodo', name: 'Seden Sodo' },
+          { id: 'amaya', name: 'Amaya' },
+          { id: 'wenchi', name: 'Wenchi' },
+          { id: 'goro_sw', name: 'Goro' },
+        ],
+      },
+      {
+        id: 'guji',
+        name: 'Guji',
+        primaryCrops: ['Specialty Coffee', 'Teff', 'Wheat', 'Cattle'],
+        woredas: [
+          { id: 'negele_borana', name: 'Negele Borana' },
+          { id: 'adola', name: 'Adola' },
+          { id: 'shakiso', name: 'Shakiso' },
+          { id: 'uraga', name: 'Uraga (Highland Specialty Coffee)' },
+          { id: 'wadera', name: 'Wadera' },
+          { id: 'ana_sora', name: 'Ana Sora' },
+        ],
+      },
+      {
+        id: 'west_guji',
+        name: 'West Guji',
+        primaryCrops: ['Specialty Coffee', 'Enset', 'Maize'],
+        woredas: [
+          { id: 'bule_hora', name: 'Bule Hora' },
+          { id: 'kercha', name: 'Kercha' },
+          { id: 'hambela_wamena', name: 'Hambela Wamena' },
+          { id: 'birbirsa_kojowa', name: 'Birbirsa Kojowa' },
+          { id: 'dugda_dawa', name: 'Dugda Dawa' },
+        ],
+      },
+      {
+        id: 'ilu_aba_bor',
+        name: 'Ilu Aba Bor',
+        primaryCrops: ['Forest Coffee', 'Spices', 'Honey'],
+        woredas: [
+          { id: 'metu', name: 'Metu' },
+          { id: 'yayu', name: 'Yayu (Coffee Biosphere Reserve)' },
+          { id: 'bure', name: 'Bure' },
+          { id: 'didu', name: 'Didu' },
+          { id: 'halu', name: 'Halu' },
+          { id: 'darimu', name: 'Darimu' },
+        ],
+      },
+      {
+        id: 'buno_bedele',
+        name: 'Buno Bedele',
+        primaryCrops: ['Coffee', 'Maize', 'Teff'],
+        woredas: [
+          { id: 'bedele', name: 'Bedele' },
+          { id: 'chora', name: 'Chora' },
+          { id: 'chewaka', name: 'Chewaka' },
+          { id: 'dabo_hana', name: 'Dabo Hana' },
+          { id: 'gechi', name: 'Gechi' },
+        ],
+      },
+      {
+        id: 'east_hararghe',
+        name: 'East Hararghe',
+        primaryCrops: ['Coffee (Harar Longberry)', 'Sorghum', 'Wheat'],
+        woredas: [
+          { id: 'haramaya', name: 'Haramaya' },
+          { id: 'aweday', name: 'Aweday' },
+          { id: 'babile', name: 'Babile' },
+          { id: 'fedis', name: 'Fedis' },
+          { id: 'bedeno', name: 'Bedeno' },
+          { id: 'girawa', name: 'Girawa' },
+          { id: 'deder', name: 'Deder' },
+        ],
+      },
+      {
+        id: 'west_hararghe',
+        name: 'West Hararghe',
+        primaryCrops: ['Coffee', 'Sorghum', 'Maize'],
+        woredas: [
+          { id: 'chiro', name: 'Chiro' },
+          { id: 'bedessa', name: 'Bedessa' },
+          { id: 'doba', name: 'Doba' },
+          { id: 'gemechis', name: 'Gemechis' },
+          { id: 'habro', name: 'Habro' },
+          { id: 'tulo', name: 'Tulo' },
+        ],
+      },
+      {
+        id: 'east_welega',
+        name: 'East Welega',
+        primaryCrops: ['Coffee', 'Teff', 'Maize'],
+        woredas: [
+          { id: 'nekemte', name: 'Nekemte' },
+          { id: 'guto_gida', name: 'Guto Gida' },
+          { id: 'sibu_sire', name: 'Sibu Sire' },
+          { id: 'wayu_tuka', name: 'Wayu Tuka' },
+          { id: 'diga', name: 'Diga' },
+        ],
+      },
+      {
+        id: 'west_welega',
+        name: 'West Welega',
+        primaryCrops: ['Coffee', 'Teff', 'Sesame'],
+        woredas: [
+          { id: 'gimbi', name: 'Gimbi' },
+          { id: 'boji_chokorsa', name: 'Boji Chokorsa' },
+          { id: 'jarso', name: 'Jarso' },
+          { id: 'nejo', name: 'Nejo' },
+          { id: 'ayira', name: 'Ayira' },
+        ],
+      },
+      {
+        id: 'horo_guduru_welega',
+        name: 'Horo Guduru Welega',
+        primaryCrops: ['Teff', 'Wheat', 'Niger Seed (Nug)'],
+        woredas: [
+          { id: 'shambu', name: 'Shambu' },
+          { id: 'horo', name: 'Horo' },
+          { id: 'guduru', name: 'Guduru' },
+          { id: 'hababo_guduru', name: 'Hababo Guduru' },
+        ],
+      },
+    ],
+  },
+
+  amhara: {
+    region: 'Amhara',
+    country: 'Ethiopia',
+    zones: [
+      {
+        id: 'east_gojjam',
+        name: 'East Gojjam',
+        primaryCrops: ['Teff (Magna)', 'Wheat', 'Maize', 'Chickpeas'],
+        woredas: [
+          { id: 'debre_markos', name: 'Debre Markos' },
+          { id: 'anamuro', name: 'Aneded' },
+          { id: 'awabel', name: 'Awabel' },
+          { id: 'baso_liben', name: 'Baso Liben' },
+          { id: 'dejen', name: 'Dejen' },
+          { id: 'machakel', name: 'Machakel' },
+          { id: 'shebel_berenta', name: 'Shebel Berenta' },
+        ],
+      },
+      {
+        id: 'west_gojjam',
+        name: 'West Gojjam',
+        primaryCrops: ['Maize', 'Teff', 'Wheat', 'Finger Millet'],
+        woredas: [
+          { id: 'finote_selam', name: 'Finote Selam' },
+          { id: 'bure_amhara', name: 'Bure' },
+          { id: 'dembecha', name: 'Dembecha' },
+          { id: 'jabi_tehnan', name: 'Jabi Tehnan' },
+          { id: 'koga', name: 'Mecha (Koga Irrigation Scheme)' },
+          { id: 'sekat', name: 'Sekela (Source of Blue Nile)' },
+        ],
+      },
+      {
+        id: 'south_gondar',
+        name: 'South Gondar',
+        primaryCrops: ['Teff', 'Wheat', 'Barley', 'Potatoes'],
+        woredas: [
+          { id: 'debre_tabor', name: 'Debre Tabor' },
+          { id: 'fogera', name: 'Fogera (Rice & Cattle Basin)' },
+          { id: 'dera', name: 'Dera' },
+          { id: 'farta', name: 'Farta' },
+          { id: 'ebat', name: 'Ebinat' },
+          { id: 'libo_kemkem', name: 'Libo Kemkem' },
+        ],
+      },
+      {
+        id: 'north_shewa_amhara',
+        name: 'North Shewa (Amhara)',
+        primaryCrops: ['Barley', 'Wheat', 'Faba Beans', 'Field Peas'],
+        woredas: [
+          { id: 'debre_birhan', name: 'Debre Birhan' },
+          { id: 'ankober', name: 'Ankober' },
+          { id: 'angolalla_tera', name: 'Angolalla Tera' },
+          { id: 'basona_werana', name: 'Basona Werana' },
+          { id: 'hagere_mariam', name: 'Hagere Mariam' },
+          { id: 'moretna_jiru', name: 'Moretna Jiru' },
+        ],
+      },
+      {
+        id: 'awi',
+        name: 'Awi Administrative Zone',
+        primaryCrops: ['Potatoes', 'Barley', 'Wheat', 'Maize'],
+        woredas: [
+          { id: 'injibara', name: 'Injibara' },
+          { id: 'dangila', name: 'Dangila' },
+          { id: 'faggeta_lekoma', name: 'Faggeta Lekoma' },
+          { id: 'guangua', name: 'Guangua' },
+          { id: 'banja_shekudad', name: 'Banja Shekudad' },
+        ],
+      },
+    ],
+  },
+
+  sidama: {
+    region: 'Sidama',
+    country: 'Ethiopia',
+    zones: [
+      {
+        id: 'sidama_coffee_highlands',
+        name: 'Sidama Specialty Coffee Highlands',
+        primaryCrops: ['Grade 1 Washed Arabica Coffee', 'Enset (False Banana)', 'Avocado'],
+        woredas: [
+          { id: 'hawassa_peri', name: 'Hawassa Peri-Urban' },
+          { id: 'aleta_wondo', name: 'Aleta Wondo' },
+          { id: 'dale', name: 'Dale' },
+          { id: 'shebedino', name: 'Shebedino' },
+          { id: 'wondo_genet', name: 'Wondo Genet' },
+          { id: 'wonsho', name: 'Wonsho' },
+          { id: 'dara_sidama', name: 'Dara' },
+          { id: 'hula', name: 'Hula' },
+          { id: 'bensa', name: 'Bensa (Cup of Excellence Micro-Lots)' },
+          { id: 'aroresa', name: 'Aroresa' },
+        ],
+      },
+    ],
+  },
+
+  south_ethiopia: {
+    region: 'South Ethiopia Regional State',
+    country: 'Ethiopia',
+    zones: [
+      {
+        id: 'gedeo',
+        name: 'Gedeo (Yirgacheffe Coffee Zone)',
+        primaryCrops: ['Yirgacheffe Specialty Arabica', 'Enset', 'Fruits'],
+        woredas: [
+          { id: 'dilla', name: 'Dilla' },
+          { id: 'yirgacheffe', name: 'Yirgacheffe' },
+          { id: 'kochere', name: 'Kochere' },
+          { id: 'gedeb', name: 'Gedeb' },
+          { id: 'wonago', name: 'Wonago' },
+          { id: 'bule', name: 'Bule' },
+        ],
+      },
+      {
+        id: 'wolaita',
+        name: 'Wolaita Zone',
+        primaryCrops: ['Ginger', 'Enset', 'Sweet Potatoes', 'Maize', 'Teff'],
+        woredas: [
+          { id: 'sodo', name: 'Sodo' },
+          { id: 'damot_gale', name: 'Damot Gale' },
+          { id: 'damot_woyde', name: 'Damot Woyde' },
+          { id: 'boloso_bombe', name: 'Boloso Bombe' },
+          { id: 'kindo_koyisha', name: 'Kindo Koyisha' },
+        ],
+      },
+      {
+        id: 'gamo',
+        name: 'Gamo Zone',
+        primaryCrops: ['Apples', 'Barley', 'Enset', 'Banana (Arba Minch)'],
+        woredas: [
+          { id: 'arba_minch', name: 'Arba Minch Zuria' },
+          { id: 'chencha', name: 'Chencha (Highland Apple Basin)' },
+          { id: 'mirab_abaya', name: 'Mirab Abaya' },
+          { id: 'bonke', name: 'Bonke' },
+        ],
+      },
+    ],
+  },
+
+  central_ethiopia: {
+    region: 'Central Ethiopia Regional State',
+    country: 'Ethiopia',
+    zones: [
+      {
+        id: 'gurage',
+        name: 'Gurage Zone',
+        primaryCrops: ['Enset (Kocho)', 'Chat', 'Eucalyptus', 'Teff'],
+        woredas: [
+          { id: 'welkite', name: 'Welkite' },
+          { id: 'butajira', name: 'Butajira' },
+          { id: 'ezha', name: 'Ezha' },
+          { id: 'cheha', name: 'Cheha' },
+          { id: 'meskan', name: 'Meskan' },
+        ],
+      },
+      {
+        id: 'hadiya',
+        name: 'Hadiya Zone',
+        primaryCrops: ['Wheat', 'Teff', 'Barley', 'Enset'],
+        woredas: [
+          { id: 'hosanna', name: 'Hosanna' },
+          { id: 'lemo', name: 'Lemo' },
+          { id: 'anlemo', name: 'Anlemo' },
+          { id: 'shashogo', name: 'Shashogo' },
+        ],
+      },
+      {
+        id: 'silte',
+        name: 'Silte Zone',
+        primaryCrops: ['Red Pepper (Mito Berbere)', 'Wheat', 'Teff'],
+        woredas: [
+          { id: 'worabe', name: 'Worabe' },
+          { id: 'dalocha', name: 'Dalocha' },
+          { id: 'lanfro', name: 'Lanfro' },
+          { id: 'sankurra', name: 'Sankurra' },
+        ],
+      },
+    ],
+  },
+
+  southwest_ethiopia: {
+    region: 'Southwest Ethiopia Peoples\' Region',
+    country: 'Ethiopia',
+    zones: [
+      {
+        id: 'keffa',
+        name: 'Keffa (Birthplace of Arabica Coffee)',
+        primaryCrops: ['Wild Forest Arabica', 'Spices (Cardamom, Korarima)', 'Honey'],
+        woredas: [
+          { id: 'bonga', name: 'Bonga' },
+          { id: 'gimbo', name: 'Gimbo' },
+          { id: 'decha', name: 'Decha' },
+          { id: 'chena', name: 'Chena' },
+          { id: 'shisho_ende', name: 'Shisho Ende' },
+        ],
+      },
+      {
+        id: 'sheka',
+        name: 'Sheka Biosphere Zone',
+        primaryCrops: ['Organic Honey', 'Forest Coffee', 'Bamboo', 'Spices'],
+        woredas: [
+          { id: 'tepi', name: 'Tepi' },
+          { id: 'masha', name: 'Masha' },
+          { id: 'anderacha', name: 'Anderacha' },
+          { id: 'yeki', name: 'Yeki' },
+        ],
+      },
+      {
+        id: 'bench_sheko',
+        name: 'Bench Sheko Zone',
+        primaryCrops: ['Coffee', 'Rubber', 'Palm', 'Fruits'],
+        woredas: [
+          { id: 'mizan_teferi', name: 'Mizan Teferi' },
+          { id: 'semen_bench', name: 'Semen Bench' },
+          { id: 'debub_bench', name: 'Debub Bench' },
+          { id: 'guraferda', name: 'Guraferda' },
+        ],
+      },
+    ],
+  },
+
+  tigray: {
+    region: 'Tigray',
+    country: 'Ethiopia',
+    zones: [
+      {
+        id: 'southern_tigray',
+        name: 'Southern Tigray (Raya Valley)',
+        primaryCrops: ['Sorghum', 'Teff', 'Wheat', 'Maize'],
+        woredas: [
+          { id: 'maychew', name: 'Maychew' },
+          { id: 'alamata', name: 'Alamata' },
+          { id: 'raya_azebo', name: 'Raya Azebo' },
+          { id: 'emba_alaje', name: 'Emba Alaje' },
+          { id: 'endreta', name: 'Enderta (Mekelle Peri-Urban)' },
+        ],
+      },
+      {
+        id: 'central_tigray',
+        name: 'Central Tigray',
+        primaryCrops: ['Teff', 'Barley', 'Wheat', 'Flaxseed'],
+        woredas: [
+          { id: 'axum', name: 'Axum' },
+          { id: 'adwa', name: 'Adwa' },
+          { id: 'were_lehe', name: 'Were Lehe' },
+          { id: 'kola_tembien', name: 'Kola Tembien' },
+        ],
+      },
+    ],
+  },
+
+  somali: {
+    region: 'Somali',
+    country: 'Ethiopia',
+    zones: [
+      {
+        id: 'fafan',
+        name: 'Fafan (Jijiga Zone)',
+        primaryCrops: ['Sorghum', 'Wheat', 'Barley', 'Livestock Feed'],
+        woredas: [
+          { id: 'jijiga', name: 'Jijiga' },
+          { id: 'awbare', name: 'Awbare' },
+          { id: 'kebribeyah', name: 'Kebribeyah' },
+          { id: 'tuli_guled', name: 'Tuli Guled' },
+          { id: 'babilesomali', name: 'Babile (Somali)' },
+        ],
+      },
+      {
+        id: 'shabelle_somali',
+        name: 'Shabelle Zone',
+        primaryCrops: ['Irrigated Maize', 'Sesame', 'Onions', 'Watermelon'],
+        woredas: [
+          { id: 'gode', name: 'Gode' },
+          { id: 'kelafo', name: 'Kelafo' },
+          { id: 'mustahil', name: 'Mustahil' },
+          { id: 'ferfer', name: 'Ferfer' },
+        ],
+      },
+    ],
+  },
+
+  afar: {
+    region: 'Afar',
+    country: 'Ethiopia',
+    zones: [
+      {
+        id: 'gabi_rasu',
+        name: 'Gabi Rasu (Awash Agricultural Basin)',
+        primaryCrops: ['Cotton', 'Sugarcane', 'Dates', 'Wheat', 'Pastoral Fodder'],
+        woredas: [
+          { id: 'awash_fentale', name: 'Awash Fentale' },
+          { id: 'amibara', name: 'Amibara' },
+          { id: 'gewane', name: 'Gewane' },
+          { id: 'dulecha', name: 'Dulecha' },
+        ],
+      },
+    ],
+  },
+
+  benishangul_gumuz: {
+    region: 'Benishangul-Gumuz',
+    country: 'Ethiopia',
+    zones: [
+      {
+        id: 'metekel',
+        name: 'Metekel Zone (GERD Basin)',
+        primaryCrops: ['Sesame', 'Soybeans', 'Groundnuts', 'Maize', 'Mangoes'],
+        woredas: [
+          { id: 'pawe', name: 'Pawe' },
+          { id: 'mandura', name: 'Mandura' },
+          { id: 'dangur', name: 'Dangur' },
+          { id: 'guba', name: 'Guba' },
+          { id: 'dibate', name: 'Dibate' },
+        ],
+      },
+      {
+        id: 'asosa',
+        name: 'Asosa Zone',
+        primaryCrops: ['Bamboo', 'Mangoes', 'Maize', 'Sorghum'],
+        woredas: [
+          { id: 'asosa_woreda', name: 'Asosa' },
+          { id: 'bambasi', name: 'Bambasi' },
+          { id: 'homa', name: 'Homosha' },
+        ],
+      },
+    ],
+  },
+
+  gambela: {
+    region: 'Gambela',
+    country: 'Ethiopia',
+    zones: [
+      {
+        id: 'anuak',
+        name: 'Anuak (Agnewak Zone)',
+        primaryCrops: ['Commercial Rice', 'Maize', 'Cotton', 'Fruits'],
+        woredas: [
+          { id: 'gambela_zuria', name: 'Gambela Zuria' },
+          { id: 'abobo', name: 'Abobo' },
+          { id: 'gog', name: 'Gog' },
+          { id: 'jor', name: 'Jor' },
+        ],
+      },
+    ],
+  },
+
+  harari: {
+    region: 'Harari',
+    country: 'Ethiopia',
+    zones: [
+      {
+        id: 'harar_region',
+        name: 'Harar Historic Agricultural District',
+        primaryCrops: ['Harar Specialty Coffee', 'Chat', 'Sorghum', 'Vegetables'],
+        woredas: [
+          { id: 'sofi_harari', name: 'Sofi' },
+          { id: 'erer_harari', name: 'Erer' },
+          { id: 'amir_nur', name: 'Amir Nur' },
+          { id: 'shenkor', name: 'Shenkor' },
+        ],
+      },
+    ],
+  },
+
+  dire_dawa: {
+    region: 'Dire Dawa Administration',
+    country: 'Ethiopia',
+    zones: [
+      {
+        id: 'dire_dawa_rural',
+        name: 'Dire Dawa Agricultural Periphery',
+        primaryCrops: ['Sorghum', 'Vegetables', 'Fruits', 'Goats & Livestock'],
+        woredas: [
+          { id: 'gurgura', name: 'Gurgura' },
+          { id: 'biyowale', name: 'Biyowale' },
+          { id: 'melka_jebdu', name: 'Melka Jebdu' },
+        ],
+      },
+    ],
+  },
+
+  addis_ababa: {
+    region: 'Addis Ababa Administration',
+    country: 'Ethiopia',
+    zones: [
+      {
+        id: 'addis_urban_ag',
+        name: 'Addis Ababa Peri-Urban & Greenhouse Ag',
+        primaryCrops: ['Greenhouse Horticulture', 'Poultry', 'Urban Dairy', 'Floriculture'],
+        woredas: [
+          { id: 'akaki_kality', name: 'Akaki-Kality Sub-City' },
+          { id: 'bole_bulbula', name: 'Bole Sub-City (Bulbula Basin)' },
+          { id: 'yeka_abado', name: 'Yeka Sub-City (Abado Basin)' },
+          { id: 'kolfe_keranio', name: 'Kolfe Keranio' },
+        ],
+      },
+    ],
+  },
+};
