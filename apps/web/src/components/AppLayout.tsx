@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -20,8 +20,13 @@ import {
   X,
   Compass,
   DollarSign,
-  Sparkles
+  Sparkles,
+  Check,
+  CheckCheck,
+  Trash2
 } from "lucide-react";
+import { useApp } from "@/context/AppContext";
+import { apiClient } from "@/lib/api-client";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -29,13 +34,65 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const pathname = usePathname();
+  const {
+    notifications,
+    unreadNotificationsCount,
+    markNotificationAsRead,
+    markAllNotificationsAsRead,
+    dismissNotification,
+  } = useApp();
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedCrop, setSelectedCrop] = useState("Teff");
   const [selectedFarm, setSelectedFarm] = useState("Farm Alpha");
-  const [selectedSeason, setSelectedSeason] = useState("Meher 2023");
+  const [selectedSeason, setSelectedSeason] = useState("Meher 2024");
+  
+  // Real Dynamic User & Notification Dropdown State
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [userProfile, setUserProfile] = useState<{ fullName?: string; email?: string } | null>(null);
+  const [farmsList, setFarmsList] = useState<{ id: string; name: string }[]>([]);
+  const notifRef = useRef<HTMLDivElement | null>(null);
 
   // If on auth routes, don't wrap with dashboard shell
   const isAuthRoute = pathname.startsWith("/auth");
+
+  // Load user session & real farms
+  useEffect(() => {
+    if (isAuthRoute) return;
+
+    try {
+      const stored = localStorage.getItem("gebere_user");
+      if (stored) {
+        setUserProfile(JSON.parse(stored));
+      }
+    } catch {}
+
+    async function fetchFarms() {
+      try {
+        const farms = await apiClient.getFarms();
+        if (farms && farms.length > 0) {
+          setFarmsList(farms);
+          setSelectedFarm(farms[0].name);
+        }
+      } catch {}
+    }
+    fetchFarms();
+  }, [pathname, isAuthRoute]);
+
+  // Click outside listener for notification popup
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+    }
+    if (showNotifications) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showNotifications]);
 
   if (isAuthRoute) {
     return <main className="min-h-screen bg-[#1B4332]">{children}</main>;
@@ -100,26 +157,26 @@ export default function AppLayout({ children }: AppLayoutProps) {
           {/* Navigation Links */}
           <nav className="space-y-1.5">
             {navItems.map((item) => {
-              const isActive = pathname === item.href || (item.href === "/farms" && pathname === "/my-farm");
+              const isActive = pathname === item.href;
               const Icon = item.icon;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium transition-all ${
+                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                     isActive
-                      ? "bg-[#2D6A4F] text-white shadow-md font-semibold"
-                      : "text-white/75 hover:bg-white/10 hover:text-white"
+                      ? "bg-[#2D6A4F] text-white shadow-sm font-semibold"
+                      : "text-white/80 hover:bg-white/10 hover:text-white"
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`h-4.5 w-4.5 ${isActive ? "text-white" : "text-emerald-300/70"}`} />
+                  <div className="flex items-center gap-3.5">
+                    <Icon className={`h-4 w-4 ${isActive ? "text-emerald-200" : "text-emerald-300/80"}`} />
                     <span>{item.name}</span>
                   </div>
-                  {(item as any).badge && (
-                    <span className="text-[9px] uppercase font-extrabold tracking-wider bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 px-1.5 py-0.5 rounded-full">
-                      AI
+                  {item.badge && (
+                    <span className="bg-emerald-500/20 text-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-400/20">
+                      {item.badge}
                     </span>
                   )}
                 </Link>
@@ -162,7 +219,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         {/* Top Header Bar on Warm Cream Background */}
         <header className="bg-transparent px-6 sm:px-8 pt-6 pb-2 flex flex-col md:flex-row md:items-center justify-between gap-4">
           
-          {/* Quick Filter Controls from Image 5 (Crop, Farm, Season) */}
+          {/* Quick Filter Controls */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             {/* Crop Filter */}
             <div className="flex items-center bg-white border border-[#D8D2C4] rounded-xl px-3 py-1.5 text-xs shadow-sm">
@@ -180,18 +237,26 @@ export default function AppLayout({ children }: AppLayoutProps) {
               </select>
             </div>
 
-            {/* Farm Filter */}
+            {/* Farm Filter (Dynamically Loaded from Real API/DB) */}
             <div className="flex items-center bg-white border border-[#D8D2C4] rounded-xl px-3 py-1.5 text-xs shadow-sm">
               <span className="text-gray-500 mr-2 font-medium">Farm:</span>
-              <select
-                value={selectedFarm}
-                onChange={(e) => setSelectedFarm(e.target.value)}
-                className="bg-transparent font-semibold text-[#1A1A2E] focus:outline-none cursor-pointer pr-1"
-              >
-                <option value="Farm Alpha">Farm Alpha</option>
-                <option value="Beta">Beta (Bishoftu)</option>
-                <option value="Bale South">Bale South</option>
-              </select>
+              {farmsList.length > 0 ? (
+                <select
+                  value={selectedFarm}
+                  onChange={(e) => setSelectedFarm(e.target.value)}
+                  className="bg-transparent font-semibold text-[#1A1A2E] focus:outline-none cursor-pointer pr-1"
+                >
+                  {farmsList.map((f) => (
+                    <option key={f.id} value={f.name}>
+                      {f.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <Link href="/farms" className="font-semibold text-[#2D6A4F] hover:underline">
+                  + Add Farm
+                </Link>
+              )}
             </div>
 
             {/* Season Filter */}
@@ -202,9 +267,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 onChange={(e) => setSelectedSeason(e.target.value)}
                 className="bg-transparent font-semibold text-[#1A1A2E] focus:outline-none cursor-pointer pr-1"
               >
-                <option value="Meher 2023">Meher 2023</option>
-                <option value="Belg 2024">Belg 2024</option>
                 <option value="Meher 2024">Meher 2024</option>
+                <option value="Belg 2024">Belg 2024</option>
+                <option value="Meher 2023">Meher 2023</option>
               </select>
             </div>
           </div>
@@ -222,29 +287,150 @@ export default function AppLayout({ children }: AppLayoutProps) {
               />
             </div>
 
-            {/* Notifications Bell */}
-            <button
-              type="button"
-              className="p-2 rounded-xl bg-white border border-[#D8D2C4] text-gray-600 hover:text-[#1B4332] shadow-sm relative"
-              title="Notifications"
-            >
-              <Bell className="h-4 w-4" />
-              <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-emerald-600"></span>
-            </button>
+            {/* Notifications Bell with Dynamic Signal Indicator */}
+            <div className="relative" ref={notifRef}>
+              <button
+                type="button"
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="p-2 rounded-xl bg-white border border-[#D8D2C4] text-gray-600 hover:text-[#1B4332] shadow-sm relative transition-colors"
+                title="Notifications"
+              >
+                <Bell className="h-4 w-4" />
+                
+                {/* Dynamic Unread Signal - Renders ONLY when unreadNotificationsCount > 0 */}
+                {unreadNotificationsCount > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-emerald-600 text-white text-[10px] font-extrabold flex items-center justify-center shadow-sm animate-pulse">
+                    {unreadNotificationsCount}
+                  </span>
+                )}
+              </button>
 
-            {/* User Profile Pill */}
-            <Link
-              href="/profile"
-              className="flex items-center gap-2.5 bg-white border border-[#D8D2C4] rounded-xl px-3 py-1.5 shadow-sm hover:border-[#2D6A4F] transition-colors"
-            >
-              <div className="h-6 w-6 rounded-full bg-[#2D6A4F] text-white flex items-center justify-center text-xs font-bold">
-                A
-              </div>
-              <div className="flex flex-col text-left">
-                <span className="text-xs font-bold text-[#1A1A2E] leading-none">Abebe</span>
-                <span className="text-[10px] text-gray-500 leading-tight">Profile</span>
-              </div>
-            </Link>
+              {/* Real Interactive Notification Dropdown */}
+              {showNotifications && (
+                <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-[#D8D2C4] z-50 overflow-hidden animate-fade-in">
+                  <div className="p-3.5 bg-[#FAF7F2] border-b border-[#E5DFD3] flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Bell className="h-4 w-4 text-[#2D6A4F]" />
+                      <span className="text-xs font-extrabold text-[#1A1A2E]">
+                        Notifications
+                      </span>
+                      {unreadNotificationsCount > 0 && (
+                        <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                          {unreadNotificationsCount} unread
+                        </span>
+                      )}
+                    </div>
+                    {unreadNotificationsCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={markAllNotificationsAsRead}
+                        className="text-[11px] font-semibold text-[#2D6A4F] hover:underline flex items-center gap-1"
+                      >
+                        <CheckCheck className="h-3 w-3" />
+                        <span>Mark all as read</span>
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="max-h-80 overflow-y-auto divide-y divide-gray-100">
+                    {notifications.length === 0 ? (
+                      <div className="p-6 text-center text-xs text-gray-400">
+                        No notifications yet. You're all caught up!
+                      </div>
+                    ) : (
+                      notifications.map((n) => (
+                        <div
+                          key={n.id}
+                          className={`p-3.5 transition-colors flex items-start gap-3 ${
+                            n.read ? "bg-white hover:bg-gray-50/50" : "bg-emerald-50/40 hover:bg-emerald-50/70"
+                          }`}
+                        >
+                          <div
+                            className={`h-7 w-7 rounded-xl flex items-center justify-center flex-shrink-0 text-xs ${
+                              n.type === "diagnosis"
+                                ? "bg-purple-100 text-purple-700"
+                                : n.type === "farm"
+                                ? "bg-emerald-100 text-emerald-700"
+                                : n.type === "marketplace"
+                                ? "bg-amber-100 text-amber-700"
+                                : "bg-blue-100 text-blue-700"
+                            }`}
+                          >
+                            {n.type === "diagnosis" ? "🔬" : n.type === "farm" ? "🌱" : n.type === "marketplace" ? "🌾" : "ℹ️"}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold text-gray-900 truncate">
+                                {n.title}
+                              </span>
+                              {!n.read && (
+                                <span className="h-2 w-2 rounded-full bg-emerald-600 flex-shrink-0"></span>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-gray-600 mt-0.5 leading-snug">
+                              {n.message}
+                            </p>
+                            <div className="flex items-center justify-between mt-1.5 pt-1 text-[10px] text-gray-400">
+                              <span>{new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                              <div className="flex items-center gap-2">
+                                {n.link && (
+                                  <Link
+                                    href={n.link}
+                                    onClick={() => {
+                                      markNotificationAsRead(n.id);
+                                      setShowNotifications(false);
+                                    }}
+                                    className="font-bold text-[#2D6A4F] hover:underline"
+                                  >
+                                    View &rarr;
+                                  </Link>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => dismissNotification(n.id)}
+                                  className="text-gray-400 hover:text-red-500"
+                                >
+                                  Dismiss
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Dynamic User Profile Pill */}
+            {userProfile ? (
+              <Link
+                href="/profile"
+                className="flex items-center gap-2.5 bg-white border border-[#D8D2C4] rounded-xl px-3 py-1.5 shadow-sm hover:border-[#2D6A4F] transition-colors"
+              >
+                <div className="h-6 w-6 rounded-full bg-[#2D6A4F] text-white flex items-center justify-center text-xs font-bold uppercase">
+                  {userProfile.fullName ? userProfile.fullName.charAt(0) : userProfile.email?.charAt(0) || "U"}
+                </div>
+                <div className="flex flex-col text-left max-w-[110px]">
+                  <span className="text-xs font-bold text-[#1A1A2E] leading-none truncate">
+                    {userProfile.fullName || userProfile.email?.split("@")[0] || "Farmer"}
+                  </span>
+                  <span className="text-[10px] text-emerald-700 font-semibold leading-tight">
+                    Farmer
+                  </span>
+                </div>
+              </Link>
+            ) : (
+              <Link
+                href="/auth/login"
+                className="flex items-center gap-2 bg-[#2D6A4F] hover:bg-[#1B4332] text-white rounded-xl px-3 py-1.5 text-xs font-bold shadow-sm transition-colors"
+              >
+                <User className="h-3.5 w-3.5" />
+                <span>Sign In</span>
+              </Link>
+            )}
+
           </div>
         </header>
 

@@ -22,11 +22,27 @@ export interface DiagnosticHistoryItem {
   severity: "low" | "medium" | "high";
 }
 
+export interface NotificationItem {
+  id: string;
+  title: string;
+  message: string;
+  timestamp: string;
+  type: "diagnosis" | "marketplace" | "farm" | "system";
+  read: boolean;
+  link?: string;
+}
+
 interface AppContextType {
   listings: MarketplaceListing[];
   addListing: (listing: Omit<MarketplaceListing, "id">) => void;
   diagnoses: DiagnosticHistoryItem[];
   addDiagnosis: (diagnosis: Omit<DiagnosticHistoryItem, "id" | "timestamp">) => void;
+  notifications: NotificationItem[];
+  unreadNotificationsCount: number;
+  addNotification: (notification: Omit<NotificationItem, "id" | "timestamp" | "read">) => void;
+  markNotificationAsRead: (id: string) => void;
+  markAllNotificationsAsRead: () => void;
+  dismissNotification: (id: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -99,7 +115,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [listings, setListings] = useState<MarketplaceListing[]>(initialListings);
   const [diagnoses, setDiagnoses] = useState<DiagnosticHistoryItem[]>(initialDiagnoses);
 
-  // Load listings and diagnoses from Neon database
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+
+  // Load listings, diagnoses, and notifications
   useEffect(() => {
     async function loadData() {
       const dbListings = await getListingsAction();
@@ -113,7 +131,76 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
     }
     loadData();
+
+    try {
+      const stored = localStorage.getItem("gebere_notifications");
+      if (stored) {
+        setNotifications(JSON.parse(stored));
+      } else {
+        const initialNotes: NotificationItem[] = [
+          {
+            id: "notif-welcome",
+            title: "Welcome to Oomisha360",
+            message: "Supabase Authentication & Gebere Vision AI services are active.",
+            timestamp: new Date().toISOString(),
+            type: "system",
+            read: false,
+            link: "/gebere-vision-ai"
+          }
+        ];
+        setNotifications(initialNotes);
+        localStorage.setItem("gebere_notifications", JSON.stringify(initialNotes));
+      }
+    } catch {}
   }, []);
+
+  const unreadNotificationsCount = notifications.filter((n) => !n.read).length;
+
+  const addNotification = (notif: Omit<NotificationItem, "id" | "timestamp" | "read">) => {
+    const newNotif: NotificationItem = {
+      ...notif,
+      id: `notif-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      read: false
+    };
+    setNotifications((prev) => {
+      const updated = [newNotif, ...prev];
+      try {
+        localStorage.setItem("gebere_notifications", JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
+  const markNotificationAsRead = (id: string) => {
+    setNotifications((prev) => {
+      const updated = prev.map((n) => (n.id === id ? { ...n, read: true } : n));
+      try {
+        localStorage.setItem("gebere_notifications", JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
+  const markAllNotificationsAsRead = () => {
+    setNotifications((prev) => {
+      const updated = prev.map((n) => ({ ...n, read: true }));
+      try {
+        localStorage.setItem("gebere_notifications", JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
+  const dismissNotification = (id: string) => {
+    setNotifications((prev) => {
+      const updated = prev.filter((n) => n.id !== id);
+      try {
+        localStorage.setItem("gebere_notifications", JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
 
   const addListing = async (newListingData: Omit<MarketplaceListing, "id">) => {
     // Optimistic UI update
@@ -143,7 +230,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AppContext.Provider value={{ listings, addListing, diagnoses, addDiagnosis }}>
+    <AppContext.Provider
+      value={{
+        listings,
+        addListing,
+        diagnoses,
+        addDiagnosis,
+        notifications,
+        unreadNotificationsCount,
+        addNotification,
+        markNotificationAsRead,
+        markAllNotificationsAsRead,
+        dismissNotification
+      }}
+    >
       {children}
     </AppContext.Provider>
   );

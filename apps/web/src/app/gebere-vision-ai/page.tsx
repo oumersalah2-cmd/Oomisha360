@@ -26,6 +26,7 @@ import {
   Download,
 } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
+import { useApp } from "@/context/AppContext";
 import { EthiopiaRegionSummary, ZoneItem, DiagnosisResult } from "@gebere/shared";
 
 interface SampleImage {
@@ -75,6 +76,7 @@ const SAMPLE_FIELD_IMAGES: SampleImage[] = [
 ];
 
 export default function GebereVisionAIPage() {
+  const { addNotification } = useApp();
   // Cascading Location (All Ethiopia)
   const [regions, setRegions] = useState<EthiopiaRegionSummary[]>([]);
   const [selectedRegion, setSelectedRegion] = useState("Oromia");
@@ -307,6 +309,14 @@ export default function GebereVisionAIPage() {
         };
         setDiagnosisResult(enrichedResult);
         setHistory((prev) => [enrichedResult, ...prev.slice(0, 9)]);
+
+        // Dispatch real notification to header bell
+        addNotification({
+          title: `AI Diagnosis: ${enrichedResult.diseaseName}`,
+          message: `${selectedCrop} leaf analyzed in ${selectedZone}, ${selectedRegion} (${enrichedResult.confidenceScore}% confidence).`,
+          type: "diagnosis",
+          link: "/gebere-vision-ai",
+        });
       } else {
         setErrorMessage("AI diagnostic service returned an empty response. Please verify the API connection.");
       }
@@ -335,6 +345,14 @@ export default function GebereVisionAIPage() {
         notes: `Urgent agronomist verification requested for ${diagnosisResult.diseaseName} (${diagnosisResult.severity} Severity).`,
       });
       setEscalateSuccess(true);
+
+      // Dispatch real notification to header bell
+      addNotification({
+        title: "Agronomist Escalation Dispatched",
+        message: `Field visit requested for ${diagnosisResult.diseaseName} in ${selectedZone}, ${selectedRegion}.`,
+        type: "system",
+        link: "/gebere-vision-ai",
+      });
       setTimeout(() => {
         setEscalateSuccess(false);
         setShowEscalateModal(false);
