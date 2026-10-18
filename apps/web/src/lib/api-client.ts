@@ -20,6 +20,10 @@ import {
   calculateRectangularArea,
   calculatePolygonArea,
   calculateFinanceSummary,
+  CropProtectionProduct,
+  CropProtectionListing,
+  CropProtectionGuidanceResult,
+  CropProtectionInquiryInput,
 } from '@gebere/shared';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
@@ -597,6 +601,109 @@ export const apiClient = {
       success: res.success,
       message: (res as any).message || (res.success ? 'Request submitted successfully.' : 'Failed to submit request.'),
     };
+  },
+
+  // 13. Crop Protection & Agricultural Medicines
+  async getCropProtectionProducts(filter?: {
+    crop?: string;
+    category?: string;
+    query?: string;
+    registrationStatus?: string;
+  }): Promise<{ products: CropProtectionProduct[]; total: number }> {
+    const params = new URLSearchParams();
+    if (filter?.crop && filter.crop !== 'all') params.append('crop', filter.crop);
+    if (filter?.category && filter.category !== 'all') params.append('category', filter.category);
+    if (filter?.query) params.append('query', filter.query);
+    if (filter?.registrationStatus && filter.registrationStatus !== 'all')
+      params.append('registrationStatus', filter.registrationStatus);
+
+    const query = params.toString() ? `?${params.toString()}` : '';
+    const res = await apiRequest<CropProtectionProduct[]>(`/crop-protection/products${query}`);
+    if (res.success && res.data) {
+      return { products: res.data, total: (res as any).total ?? res.data.length };
+    }
+    return { products: [], total: 0 };
+  },
+
+  async getCropProtectionProduct(id: string): Promise<CropProtectionProduct | null> {
+    const res = await apiRequest<CropProtectionProduct>(`/crop-protection/products/${id}`);
+    if (res.success && res.data) return res.data;
+    return null;
+  },
+
+  async getCropProtectionGuidance(crop: string, diseaseOrProblem?: string): Promise<CropProtectionGuidanceResult | null> {
+    const params = new URLSearchParams();
+    params.append('crop', crop);
+    if (diseaseOrProblem) params.append('problem', diseaseOrProblem);
+
+    const res = await apiRequest<CropProtectionGuidanceResult>(`/crop-protection/guidance?${params.toString()}`);
+    if (res.success && res.data) return res.data;
+    return null;
+  },
+
+  async getCropProtectionListings(filter?: {
+    productId?: string;
+    region?: string;
+    zone?: string;
+    woreda?: string;
+    inStockOnly?: boolean;
+    myOnly?: boolean;
+  }): Promise<CropProtectionListing[]> {
+    const params = new URLSearchParams();
+    if (filter?.productId) params.append('productId', filter.productId);
+    if (filter?.region && filter.region !== 'all') params.append('region', filter.region);
+    if (filter?.zone && filter.zone !== 'all') params.append('zone', filter.zone);
+    if (filter?.woreda && filter.woreda !== 'all') params.append('woreda', filter.woreda);
+    if (filter?.inStockOnly) params.append('inStockOnly', 'true');
+    if (filter?.myOnly) params.append('myOnly', 'true');
+
+    const query = params.toString() ? `?${params.toString()}` : '';
+    const res = await apiRequest<CropProtectionListing[]>(`/crop-protection/listings${query}`);
+    if (res.success && res.data) return res.data;
+    return [];
+  },
+
+  async createCropProtectionListing(input: any): Promise<{ success: boolean; data?: CropProtectionListing; error?: string }> {
+    const res = await apiRequest<CropProtectionListing>('/crop-protection/listings', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+    if (res.success && res.data) {
+      return { success: true, data: res.data };
+    }
+    return { success: false, error: res.error?.message || 'Failed to create listing' };
+  },
+
+  async updateCropProtectionListing(id: string, input: any): Promise<{ success: boolean; data?: CropProtectionListing; error?: string }> {
+    const res = await apiRequest<CropProtectionListing>(`/crop-protection/listings/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    });
+    if (res.success && res.data) {
+      return { success: true, data: res.data };
+    }
+    return { success: false, error: res.error?.message || 'Failed to update listing' };
+  },
+
+  async deleteCropProtectionListing(id: string): Promise<{ success: boolean; error?: string }> {
+    const res = await apiRequest<{ success: boolean }>(`/crop-protection/listings/${id}`, {
+      method: 'DELETE',
+    });
+    return { success: res.success, error: res.error?.message };
+  },
+
+  async sendCropProtectionInquiry(
+    listingId: string,
+    input: CropProtectionInquiryInput
+  ): Promise<{ success: boolean; message?: string; error?: string }> {
+    const res = await apiRequest<any>(`/crop-protection/listings/${listingId}/inquiries`, {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+    if (res.success) {
+      return { success: true, message: (res as any).message || 'Inquiry transmitted.' };
+    }
+    return { success: false, error: res.error?.message || 'Failed to submit inquiry' };
   },
 };
 

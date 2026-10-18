@@ -23,10 +23,13 @@ import {
   Sparkles,
   Check,
   CheckCheck,
-  Trash2
+  Trash2,
+  ShieldCheck,
+  Globe,
 } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { apiClient } from "@/lib/api-client";
+import { Language } from "@/lib/i18n";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -35,6 +38,8 @@ interface AppLayoutProps {
 export default function AppLayout({ children }: AppLayoutProps) {
   const pathname = usePathname();
   const {
+    language,
+    setLanguage,
     notifications,
     unreadNotificationsCount,
     markNotificationAsRead,
@@ -99,18 +104,61 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }
 
   const navItems = [
-    { name: "Land Calculator", href: "/land-calculator", icon: Calculator },
-    { name: "My Farm", href: "/farms", icon: Home },
-    { name: "Crops", href: "/crops", icon: Sprout },
-    { name: "Gebere Vision AI", href: "/gebere-vision-ai", icon: Sparkles, badge: "AI Assistant" },
-    { name: "Finance Dashboard", href: "/finance", icon: LayoutDashboard },
-    { name: "Expenses", href: "/expenses", icon: Wallet },
-    { name: "Markets", href: "/marketplace", icon: ShoppingBag },
+    {
+      name: language === "om" ? "Shakallii Lafaa" : language === "am" ? "የመሬት ስሌት" : "Land Calculator",
+      href: "/land-calculator",
+      icon: Calculator,
+    },
+    {
+      name: language === "om" ? "Maasii Koo" : language === "am" ? "ማሳዬ" : "My Farm",
+      href: "/farms",
+      icon: Home,
+    },
+    {
+      name: language === "om" ? "Oomishaalee" : language === "am" ? "ሰብሎች" : "Crops",
+      href: "/crops",
+      icon: Sprout,
+    },
+    {
+      name: "Gebere Vision AI",
+      href: "/gebere-vision-ai",
+      icon: Sparkles,
+      badge: language === "om" ? "Gargaaraa AI" : language === "am" ? "የAI ረዳት" : "AI Assistant",
+    },
+    {
+      name: language === "om" ? "Eegumsa Oomishaa" : language === "am" ? "የሰብል ጥበቃ" : "Crop Protection",
+      href: "/crop-protection",
+      icon: ShieldCheck,
+      badge: language === "om" ? "Qoricha" : language === "am" ? "መድኃኒቶች" : "Medicines",
+    },
+    {
+      name: language === "om" ? "Fayinaansii" : language === "am" ? "ፋይናንስ" : "Finance Dashboard",
+      href: "/finance",
+      icon: LayoutDashboard,
+    },
+    {
+      name: language === "om" ? "Baasiiwwan" : language === "am" ? "ወጪዎች" : "Expenses",
+      href: "/expenses",
+      icon: Wallet,
+    },
+    {
+      name: language === "om" ? "Gabaa" : language === "am" ? "ገበያ" : "Markets",
+      href: "/marketplace",
+      icon: ShoppingBag,
+    },
   ];
 
   const bottomNavItems = [
-    { name: "Settings", href: "/profile", icon: Settings },
-    { name: "Help", href: "/features", icon: HelpCircle },
+    {
+      name: language === "om" ? "Qindaa'ina" : language === "am" ? "ቅንብሮች" : "Settings",
+      href: "/profile",
+      icon: Settings,
+    },
+    {
+      name: language === "om" ? "Gargaarsa" : language === "am" ? "እርዳታ" : "Help",
+      href: "/features",
+      icon: HelpCircle,
+    },
   ];
 
   return (
@@ -124,12 +172,27 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </div>
           <span className="font-bold text-lg tracking-tight">Oomisha360</span>
         </Link>
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-1.5 rounded-lg bg-white/10 text-white"
-        >
-          {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+
+        <div className="flex items-center gap-2">
+          {/* Mobile Language Selector */}
+          <select
+            value={language}
+            aria-label="Language"
+            onChange={(e) => setLanguage(e.target.value as Language)}
+            className="bg-white/15 border border-white/20 text-white rounded-lg px-2 py-1 text-xs font-bold focus:outline-none"
+          >
+            <option value="om" className="text-gray-900">🌳 ORM</option>
+            <option value="am" className="text-gray-900">🇪🇹 አማ</option>
+            <option value="en" className="text-gray-900">🇬🇧 EN</option>
+          </select>
+
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-1.5 rounded-lg bg-white/10 text-white"
+          >
+            {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </div>
 
       {/* Left Sidebar (Deep Forest Green #1B4332) */}
@@ -274,9 +337,24 @@ export default function AppLayout({ children }: AppLayoutProps) {
             </div>
           </div>
 
-          {/* Right Header Controls: Search, Notifications, Profile */}
+          {/* Right Header Controls: Search, Language Switcher, Notifications, Profile */}
           <div className="flex items-center gap-3 self-end md:self-auto">
             
+            {/* Desktop Language Switcher (Afaan Oromoo / አማርኛ / English) */}
+            <div className="flex items-center bg-white border border-[#D8D2C4] rounded-xl px-2.5 py-1 text-xs shadow-sm">
+              <Globe className="h-3.5 w-3.5 text-gray-500 mr-1.5" />
+              <select
+                value={language}
+                aria-label="Language selector"
+                onChange={(e) => setLanguage(e.target.value as Language)}
+                className="bg-transparent font-bold text-[#1B4332] focus:outline-none cursor-pointer text-xs"
+              >
+                <option value="om">🌳 Afaan Oromoo</option>
+                <option value="am">🇪🇹 አማርኛ</option>
+                <option value="en">🇬🇧 English</option>
+              </select>
+            </div>
+
             {/* Search Input */}
             <div className="relative hidden sm:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />

@@ -306,3 +306,5 @@ export interface DiagnosisResult {
   imageUrl?: string;
 }
 
+export * from './crop-protection.js';
+

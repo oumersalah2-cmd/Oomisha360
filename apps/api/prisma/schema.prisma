@@ -25,6 +25,7 @@ model UserProfile {
   expenses        Expense[]
   harvests        Harvest[]
   listings        MarketplaceListing[]
+  cropProtectionListings CropProtectionListing[]
 
   @@map("user_profiles")
 }
@@ -199,4 +200,89 @@ model CropDiagnosisLog {
   createdAt         DateTime  @default(now())
 
   @@map("crop_diagnosis_logs")
+}
+
+model CropProtectionProduct {
+  id                     String                     @id @default(uuid())
+  tradeName              String
+  brandName              String?
+  activeIngredient       String
+  category               String                     // fungicide, insecticide, herbicide, seed_treatment, biological_control, other
+  formulation            String                     // WP, EC, SC, WG, etc.
+  registrationNumber     String                     @unique
+  registrationStatus     String                     @default("registered") // registered, provisional, sample_demo
+  registrationAuthority  String                     @default("Ministry of Agriculture (MoA) Ethiopia")
+  whoToxicityClass       String                     @default("Class III (Slightly Hazardous)")
+  targetPests            String[]                   @default([])
+  supportedCrops         String[]                   @default([])
+  safetyPrecautions      String[]                   @default([])
+  ppeRequirements        String[]                   @default([])
+  withholdingPeriodDays  Int                        @default(14)
+  storageInstructions    String?
+  disposalInstructions   String?
+  packagingSizes         String[]                   @default([])
+  sourceOrganization     String                     @default("Ethiopian Agricultural Authority (EAA)")
+  lastVerifiedAt         DateTime                   @default(now())
+  isVerified             Boolean                    @default(true)
+  isSampleData           Boolean                    @default(false)
+  createdAt              DateTime                   @default(now())
+  updatedAt              DateTime                   @updatedAt
+
+  approvedUses           ProductRegisteredUse[]
+  listings               CropProtectionListing[]
+
+  @@index([category])
+  @@index([activeIngredient])
+  @@map("crop_protection_products")
+}
+
+model ProductRegisteredUse {
+  id                 String                @id @default(uuid())
+  productId          String
+  crop               String
+  targetProblem      String
+  applicationMethod  String
+  applicationTiming  String
+  safetyNotes        String
+  phiDays            Int                   @default(14)
+  createdAt          DateTime              @default(now())
+
+  product            CropProtectionProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([crop])
+  @@map("product_registered_uses")
+}
+
+model CropProtectionListing {
+  id               String                @id @default(uuid())
+  productId        String
+  supplierId       String
+  supplierName     String
+  storeName        String?
+  licenseNumber    String?
+  isVerifiedDealer Boolean               @default(false)
+  packageSize      String
+  priceAmount      Float
+  currency         String                @default("ETB")
+  inStock          Boolean               @default(true)
+  stockQuantity    Int?
+  region           String
+  zone             String
+  woreda           String
+  contactPhone     String
+  contactEmail     String?
+  notes            String?
+  status           String                @default("active") // active, out_of_stock, inactive
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  product          CropProtectionProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+  supplier         UserProfile           @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([supplierId])
+  @@index([region])
+  @@index([status])
+  @@map("crop_protection_listings")
 }

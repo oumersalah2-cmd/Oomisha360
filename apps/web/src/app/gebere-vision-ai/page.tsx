@@ -27,7 +27,8 @@ import {
 } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { useApp } from "@/context/AppContext";
-import { EthiopiaRegionSummary, ZoneItem, DiagnosisResult } from "@gebere/shared";
+import { EthiopiaRegionSummary, ZoneItem, DiagnosisResult, CropProtectionGuidanceResult } from "@gebere/shared";
+import { translations } from "@/lib/i18n";
 
 interface SampleImage {
   id: string;
@@ -76,7 +77,8 @@ const SAMPLE_FIELD_IMAGES: SampleImage[] = [
 ];
 
 export default function GebereVisionAIPage() {
-  const { addNotification } = useApp();
+  const { language, addNotification } = useApp();
+  const t = translations[language] || translations.en;
   // Cascading Location (All Ethiopia)
   const [regions, setRegions] = useState<EthiopiaRegionSummary[]>([]);
   const [selectedRegion, setSelectedRegion] = useState("Oromia");
@@ -106,6 +108,7 @@ export default function GebereVisionAIPage() {
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisPhase, setAnalysisPhase] = useState<string>("");
   const [diagnosisResult, setDiagnosisResult] = useState<DiagnosisResult | null>(null);
+  const [cropProtectionGuidance, setCropProtectionGuidance] = useState<CropProtectionGuidanceResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [history, setHistory] = useState<any[]>([]);
 
@@ -283,6 +286,7 @@ export default function GebereVisionAIPage() {
     setAnalyzing(true);
     setErrorMessage(null);
     setDiagnosisResult(null);
+    setCropProtectionGuidance(null);
 
     // Multi-phase feedback for farmer transparency
     setAnalysisPhase("Calibrating leaf lighting & chlorophyll spectrum...");
@@ -309,6 +313,14 @@ export default function GebereVisionAIPage() {
         };
         setDiagnosisResult(enrichedResult);
         setHistory((prev) => [enrichedResult, ...prev.slice(0, 9)]);
+
+        // Fetch verified MoA-registered crop protection products matching this crop & disease
+        if (enrichedResult.status !== "healthy") {
+          apiClient
+            .getCropProtectionGuidance(enrichedResult.crop, enrichedResult.diseaseName)
+            .then((guidance) => setCropProtectionGuidance(guidance))
+            .catch((err) => console.error("Error loading crop protection guidance:", err));
+        }
 
         // Dispatch real notification to header bell
         addNotification({
@@ -833,6 +845,82 @@ export default function GebereVisionAIPage() {
                       </li>
                     ))}
                   </ul>
+                </div>
+              )}
+
+              {/* Verified Agricultural Medicines & Crop Protection Integration */}
+              {diagnosisResult.status !== "healthy" && (
+                <div className="space-y-3 pt-3 border-t border-gray-100">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wide flex items-center gap-1.5">
+                      <ShieldCheck className="h-4 w-4 text-emerald-700" />
+                      <span>{t.aiIntegrationTitle}</span>
+                    </h4>
+                    <Link
+                      href={`/crop-protection?crop=${encodeURIComponent(diagnosisResult.crop)}`}
+                      className="text-[10px] font-bold text-[#2D6A4F] hover:underline flex items-center gap-0.5"
+                    >
+                      <span>{t.aiExploreCatalog}</span>
+                      <ChevronRight className="h-3 w-3" />
+                    </Link>
+                  </div>
+
+                  {/* Strict Safety Policy Warning */}
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-[11px] text-amber-950 space-y-1">
+                    <div className="font-bold flex items-center gap-1 text-amber-900">
+                      <AlertTriangle className="h-3.5 w-3.5 text-amber-700 flex-shrink-0" />
+                      <span>{t.aiSafetyWarningTitle}</span>
+                    </div>
+                    <p className="leading-relaxed opacity-90">
+                      {t.aiSafetyWarningBody}
+                    </p>
+                  </div>
+
+                  {/* Matching Registered Products */}
+                  {cropProtectionGuidance && cropProtectionGuidance.registeredProducts.length > 0 ? (
+                    <div className="space-y-2">
+                      <div className="text-[11px] font-semibold text-gray-600">
+                        {language === "om"
+                          ? `Qorichoota eeyyamaman ${diagnosisResult.crop} tiif:`
+                          : language === "am"
+                          ? `ለ${diagnosisResult.crop} የተፈቀዱ መድኃኒቶች:`
+                          : `MoA Registered Products for ${diagnosisResult.crop}:`}
+                      </div>
+                      {cropProtectionGuidance.registeredProducts.map((prod) => (
+                        <div
+                          key={prod.id}
+                          className="bg-white p-2.5 rounded-xl border border-[#E5DFD3] hover:border-emerald-300 transition-all text-xs flex items-center justify-between gap-2 shadow-2xs"
+                        >
+                          <div className="space-y-0.5">
+                            <div className="font-bold text-gray-900">{prod.tradeName}</div>
+                            <div className="text-[10px] text-gray-500 font-mono">
+                              {prod.activeIngredient.split("(")[0]}
+                            </div>
+                            <div className="text-[10px] text-emerald-800 font-medium font-mono">
+                              Reg: {prod.registrationNumber} • PHI: {prod.withholdingPeriodDays}d
+                            </div>
+                          </div>
+
+                          <Link
+                            href={`/crop-protection?crop=${encodeURIComponent(
+                              diagnosisResult.crop
+                            )}&query=${encodeURIComponent(prod.tradeName)}`}
+                            className="bg-[#2D6A4F] hover:bg-[#1B4332] text-white px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-colors whitespace-nowrap"
+                          >
+                            {t.aiFindDealers}
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-100 text-[11px] text-gray-600">
+                      {language === "om"
+                        ? "Sadarkaa kanatti to'annoo uumamaa fi qulqullina maasiitiin fayyadamuun gorfama. Ogeessa DA mariisisaa."
+                        : language === "am"
+                        ? "በዚህ ደረጃ ተፈጥሯዊና የግብርና አያያዝ ዘዴዎችን መጠቀም ይመረጣል። ኬሚካል ከመጠቀምዎ በፊት የልማት ጣቢያ ሠራተኛን ያማክሩ።"
+                        : "Non-chemical biological and cultural management recommended for this growth stage. Check with woreda agronomist before considering chemical inputs."}
+                    </div>
+                  )}
                 </div>
               )}
 

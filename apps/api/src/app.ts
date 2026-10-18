@@ -19,6 +19,7 @@ import { cropHealthRouter } from './modules/crop-health/crop-health.router';
 import { cropsRouter } from './modules/crops/crops.router';
 import { locationsRouter } from './modules/locations/locations.router';
 import { authRouter } from './modules/auth/auth.router';
+import { cropProtectionRouter } from './modules/crop-protection/crop-protection.router';
 
 export function createApp(): Express {
   const app = express();
@@ -98,6 +99,7 @@ export function createApp(): Express {
   v1Router.use('/crop-health', cropHealthRouter);
   v1Router.use('/crops', cropsRouter);
   v1Router.use('/locations', locationsRouter);
+  v1Router.use('/crop-protection', cropProtectionRouter);
 
   app.use(config.apiPrefix, v1Router);
 

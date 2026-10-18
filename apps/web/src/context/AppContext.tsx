@@ -9,6 +9,8 @@ import {
   createDiagnosisAction 
 } from "@/app/actions";
 
+import { Language } from "@/lib/i18n";
+
 export interface DiagnosticHistoryItem {
   id: string;
   crop: string;
@@ -33,6 +35,8 @@ export interface NotificationItem {
 }
 
 interface AppContextType {
+  language: Language;
+  setLanguage: (lang: Language) => void;
   listings: MarketplaceListing[];
   addListing: (listing: Omit<MarketplaceListing, "id">) => void;
   diagnoses: DiagnosticHistoryItem[];
@@ -112,13 +116,28 @@ const initialDiagnoses: DiagnosticHistoryItem[] = [
 ];
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
+  const [language, setLanguageState] = useState<Language>("om");
   const [listings, setListings] = useState<MarketplaceListing[]>(initialListings);
   const [diagnoses, setDiagnoses] = useState<DiagnosticHistoryItem[]>(initialDiagnoses);
 
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
 
-  // Load listings, diagnoses, and notifications
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
+    try {
+      localStorage.setItem("gebere_lang", lang);
+    } catch {}
+  };
+
+  // Load listings, diagnoses, notifications, and language
   useEffect(() => {
+    try {
+      const storedLang = localStorage.getItem("gebere_lang") as Language;
+      if (storedLang && (storedLang === "en" || storedLang === "om" || storedLang === "am")) {
+        setLanguageState(storedLang);
+      }
+    } catch {}
+
     async function loadData() {
       const dbListings = await getListingsAction();
       const dbDiagnoses = await getDiagnosesAction();
@@ -232,6 +251,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   return (
     <AppContext.Provider
       value={{
+        language,
+        setLanguage,
         listings,
         addListing,
         diagnoses,

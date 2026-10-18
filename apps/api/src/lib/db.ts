@@ -7,7 +7,13 @@ import type {
   MarketplaceListing,
   MarketplaceInquiry,
   UserProfile,
+  CropProtectionProduct,
+  CropProtectionListing,
 } from '@gebere/shared';
+import {
+  VERIFIED_CROP_PROTECTION_PRODUCTS,
+  INITIAL_VERIFIED_SUPPLIER_LISTINGS,
+} from '../modules/crop-protection/crop-protection.data';
 
 // Dynamic Prisma client type
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -95,6 +101,8 @@ export class InMemoryStore {
   public harvests: Map<string, Harvest> = new Map();
   public listings: Map<string, MarketplaceListing> = new Map();
   public inquiries: Map<string, MarketplaceInquiry> = new Map();
+  public cropProtectionProducts: Map<string, CropProtectionProduct> = new Map();
+  public cropProtectionListings: Map<string, CropProtectionListing> = new Map();
   public diagnosisLogs: Array<Record<string, unknown>> = [];
 
   constructor() {
@@ -386,7 +394,100 @@ export class InMemoryStore {
     for (const listing of listingsSeed) {
       this.listings.set(listing.id, listing);
     }
+
+    // 7. Seed Verified Crop Protection Products & Supplier Listings
+    for (const prod of VERIFIED_CROP_PROTECTION_PRODUCTS) {
+      this.cropProtectionProducts.set(prod.id, prod);
+    }
+    for (const listing of INITIAL_VERIFIED_SUPPLIER_LISTINGS) {
+      this.cropProtectionListings.set(listing.id, listing);
+    }
   }
 }
 
 export const inMemoryStore = new InMemoryStore();
+
+export async function seedCropProtectionDatabase(): Promise<void> {
+  if (!isUsingPrisma || !prisma) return;
+  try {
+    const count = await prisma.cropProtectionProduct.count();
+    if (count === 0) {
+      console.log('[DATABASE] Seeding verified Ethiopian crop protection products to PostgreSQL...');
+      await ensureUserProfile({
+        id: 'usr-demo-farmer-1',
+        email: 'farmer.demo@geberevision.et',
+        fullName: 'Abebe Demisse',
+        role: 'farmer',
+      });
+
+      for (const prod of VERIFIED_CROP_PROTECTION_PRODUCTS) {
+        await prisma.cropProtectionProduct.create({
+          data: {
+            id: prod.id,
+            tradeName: prod.tradeName,
+            brandName: prod.brandName,
+            activeIngredient: prod.activeIngredient,
+            category: prod.category,
+            formulation: prod.formulation,
+            registrationNumber: prod.registrationNumber,
+            registrationStatus: prod.registrationStatus,
+            registrationAuthority: prod.registrationAuthority,
+            whoToxicityClass: prod.whoToxicityClass,
+            targetPests: prod.targetPests,
+            supportedCrops: prod.supportedCrops,
+            safetyPrecautions: prod.safetyPrecautions,
+            ppeRequirements: prod.ppeRequirements,
+            withholdingPeriodDays: prod.withholdingPeriodDays,
+            storageInstructions: prod.storageInstructions,
+            disposalInstructions: prod.disposalInstructions,
+            packagingSizes: prod.packagingSizes,
+            sourceOrganization: prod.sourceOrganization,
+            lastVerifiedAt: new Date(prod.lastVerifiedAt),
+            isVerified: prod.isVerified,
+            isSampleData: prod.isSampleData,
+            approvedUses: {
+              create: prod.approvedUses.map((u) => ({
+                id: u.id,
+                crop: u.crop,
+                targetProblem: u.targetProblem,
+                applicationMethod: u.applicationMethod,
+                applicationTiming: u.applicationTiming,
+                safetyNotes: u.safetyNotes,
+                phiDays: u.phiDays,
+              })),
+            },
+          },
+        });
+      }
+
+      for (const listing of INITIAL_VERIFIED_SUPPLIER_LISTINGS) {
+        await prisma.cropProtectionListing.create({
+          data: {
+            id: listing.id,
+            productId: listing.productId,
+            supplierId: listing.supplierId,
+            supplierName: listing.supplierName,
+            storeName: listing.storeName,
+            licenseNumber: listing.licenseNumber,
+            isVerifiedDealer: listing.isVerifiedDealer,
+            packageSize: listing.packageSize,
+            priceAmount: listing.priceAmount,
+            currency: listing.currency,
+            inStock: listing.inStock,
+            stockQuantity: listing.stockQuantity,
+            region: listing.region,
+            zone: listing.zone,
+            woreda: listing.woreda,
+            contactPhone: listing.contactPhone,
+            contactEmail: listing.contactEmail,
+            notes: listing.notes,
+            status: listing.status,
+          },
+        });
+      }
+      console.log('[DATABASE] Seeded verified crop protection products successfully.');
+    }
+  } catch (err: any) {
+    console.error('[DATABASE] Error seeding crop protection products:', sanitizeDbError(err?.message || ''));
+  }
+}

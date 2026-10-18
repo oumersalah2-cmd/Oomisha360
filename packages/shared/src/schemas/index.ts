@@ -163,3 +163,42 @@ export const UserProfileUpdateSchema = z.object({
   cooperativeName: z.string().max(150).optional().nullable(),
   role: z.enum(['farmer', 'cooperative_manager', 'buyer', 'agronomist']).optional(),
 });
+
+export const CropProtectionCategorySchema = z.enum([
+  'fungicide',
+  'insecticide',
+  'herbicide',
+  'seed_treatment',
+  'biological_control',
+  'other',
+]);
+
+export const CropProtectionListingCreateSchema = z.object({
+  productId: z.string().min(1, 'Product ID is required'),
+  supplierName: z.string().min(2, 'Supplier name is required').max(120),
+  storeName: z.string().max(120).optional().nullable(),
+  licenseNumber: z.string().max(80).optional().nullable(),
+  packageSize: z.string().min(1, 'Package size is required').max(60),
+  priceAmount: z.number().positive('Price must be greater than zero'),
+  currency: CurrencySchema.default('ETB'),
+  inStock: z.boolean().default(true),
+  stockQuantity: z.number().int().nonnegative().optional().nullable(),
+  region: z.string().min(2, 'Region is required').max(80),
+  zone: z.string().min(1, 'Zone is required').max(80),
+  woreda: z.string().min(1, 'Woreda is required').max(80),
+  contactPhone: z.string().min(7, 'Contact phone is required').max(30),
+  contactEmail: z.string().email('Invalid email address').optional().nullable(),
+  notes: z.string().max(1000).optional().nullable(),
+  status: z.enum(['active', 'out_of_stock', 'inactive']).default('active'),
+});
+
+export const CropProtectionListingUpdateSchema = CropProtectionListingCreateSchema.partial();
+
+export const CropProtectionInquirySchema = z.object({
+  senderName: z.string().min(2, 'Sender name is required').max(100),
+  senderPhone: z.string().min(7, 'Contact phone is required').max(30),
+  senderEmail: z.string().email('Invalid email address').optional().nullable(),
+  message: z.string().min(5, 'Message must be at least 5 characters').max(1000),
+  quantityRequested: z.number().int().positive().optional().nullable(),
+});
+
