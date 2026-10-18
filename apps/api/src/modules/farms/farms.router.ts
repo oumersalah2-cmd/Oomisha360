@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { requireAuth } from '../../middleware/auth';
 import { validateBody } from '../../middleware/validate';
 import { FarmCreateSchema, FarmUpdateSchema, Farm } from '@gebere/shared';
-import { inMemoryStore, isUsingPrisma, prisma } from '../../lib/db';
+import { inMemoryStore, isUsingPrisma, prisma, ensureUserProfile } from '../../lib/db';
 import { NotFoundError, ForbiddenError } from '../../middleware/errorHandler';
 
 export const farmsRouter = Router();
@@ -40,6 +40,7 @@ farmsRouter.post(
       const farmData = req.body;
 
       if (isUsingPrisma && prisma) {
+        await ensureUserProfile(req.user!);
         const created = await prisma.farm.create({
           data: {
             ...farmData,

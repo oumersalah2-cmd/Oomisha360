@@ -18,6 +18,7 @@ import { marketplaceRouter } from './modules/marketplace/marketplace.router';
 import { cropHealthRouter } from './modules/crop-health/crop-health.router';
 import { cropsRouter } from './modules/crops/crops.router';
 import { locationsRouter } from './modules/locations/locations.router';
+import { authRouter } from './modules/auth/auth.router';
 
 export function createApp(): Express {
   const app = express();
@@ -69,9 +70,9 @@ export function createApp(): Express {
   });
   app.use('/api/', limiter);
 
-  // Body Parsing
-  app.use(express.json({ limit: '5mb' }));
-  app.use(express.urlencoded({ extended: true, limit: '5mb' }));
+  // Body Parsing (Supports high-resolution crop photos & leaf scans)
+  app.use(express.json({ limit: '25mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
   // Root information route
   app.get('/', (req: Request, res: Response) => {
@@ -86,6 +87,7 @@ export function createApp(): Express {
   // Mount API v1 router
   const v1Router = express.Router();
   v1Router.use('/health', healthRouter);
+  v1Router.use('/auth', authRouter);
   v1Router.use('/profiles', profilesRouter);
   v1Router.use('/farms', farmsRouter);
   v1Router.use('/land', landRouter);

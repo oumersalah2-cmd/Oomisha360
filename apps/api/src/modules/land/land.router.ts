@@ -10,7 +10,7 @@ import {
   LandAreaResult,
 } from '@gebere/shared';
 import { z } from 'zod';
-import { inMemoryStore, isUsingPrisma, prisma } from '../../lib/db';
+import { inMemoryStore, isUsingPrisma, prisma, ensureUserProfile } from '../../lib/db';
 import { NotFoundError, ForbiddenError, BadRequestError } from '../../middleware/errorHandler';
 
 export const landRouter = Router();
@@ -167,10 +167,19 @@ landRouter.post(
       }
 
       if (isUsingPrisma && prisma) {
+        await ensureUserProfile(req.user!);
+        let validFarmId: string | null = null;
+        if (data.farmId) {
+          const farm = await prisma.farm.findUnique({ where: { id: data.farmId } });
+          if (farm && farm.userId === userId) {
+            validFarmId = data.farmId;
+          }
+        }
+
         const created = await prisma.landRecord.create({
           data: {
             userId,
-            farmId: data.farmId || null,
+            farmId: validFarmId,
             plotName: data.plotName,
             crop: data.crop || null,
             calculationMethod: data.calculationMethod,

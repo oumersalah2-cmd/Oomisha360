@@ -27,7 +27,13 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/a
 // Session state storage helper (persists demo token or Supabase JWT)
 export const getAuthToken = (): string | null => {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('gebere_auth_token') || 'demo-user-farmer-1';
+  const token = localStorage.getItem('gebere_auth_token');
+  if (token) return token;
+  // Only fall back to demo token if demo mode is explicitly enabled
+  if (localStorage.getItem('gebere_demo_mode') === 'true') {
+    return 'demo-user-farmer-1';
+  }
+  return null;
 };
 
 export const setAuthToken = (token: string | null) => {
@@ -37,6 +43,12 @@ export const setAuthToken = (token: string | null) => {
   } else {
     localStorage.removeItem('gebere_auth_token');
   }
+};
+
+export const clearAuthSession = () => {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem('gebere_auth_token');
+  localStorage.removeItem('gebere_demo_mode');
 };
 
 export const isDemoMode = (): boolean => {

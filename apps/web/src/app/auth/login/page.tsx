@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronDown, Globe } from "lucide-react";
+import { ChevronDown, Globe, AlertCircle, Info } from "lucide-react";
 import { setAuthToken, setDemoMode } from "@/lib/api-client";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,18 +13,52 @@ export default function LoginPage() {
   const [password, setPassword] = useState("password123");
   const [isTopLangOpen, setIsTopLangOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [hasSupabaseKeys, setHasSupabaseKeys] = useState(false);
+
+  useEffect(() => {
+    setHasSupabaseKeys(isSupabaseConfigured());
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMsg(null);
 
-    setAuthToken("demo-user-farmer-1");
-    setDemoMode(true);
+    const email = identifier.includes("@") ? identifier.trim() : `${identifier.trim()}@oomisha360.et`;
 
-    setTimeout(() => {
+    // 1. Real Supabase Authentication
+    if (isSupabaseConfigured()) {
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) {
+          setErrorMsg(error.message);
+          setLoading(false);
+          return;
+        }
+
+        if (data.session) {
+          setAuthToken(data.session.access_token);
+          setDemoMode(false);
+          router.push("/farms");
+          return;
+        }
+      } catch (err: any) {
+        setErrorMsg(err.message || "Failed to authenticate with Supabase Auth.");
+        setLoading(false);
+        return;
+      }
+    } else {
+      // Supabase Anon Key is not yet configured in web .env.local
+      setErrorMsg(
+        "Supabase Auth keys are not yet configured in NEXT_PUBLIC_SUPABASE_ANON_KEY. Use Quick Demo Sign-In below or provide your Supabase anon key."
+      );
       setLoading(false);
-      router.push("/farms");
-    }, 500);
+    }
   };
 
   const handleDemoSignIn = () => {
@@ -96,6 +131,25 @@ export default function LoginPage() {
           </h2>
 
           <form onSubmit={handleLogin} className="space-y-4">
+            {errorMsg && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-3.5 py-2.5 rounded-xl text-xs flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
+
+            {hasSupabaseKeys ? (
+              <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-1.5 rounded-xl text-[11px] flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                <span>Connected to Supabase Auth GoTrue</span>
+              </div>
+            ) : (
+              <div className="bg-amber-50 border border-amber-200 text-amber-800 px-3 py-1.5 rounded-xl text-[11px] flex items-center gap-1.5">
+                <Info className="h-3.5 w-3.5 text-amber-600 shrink-0" />
+                <span>Development demo mode (Supabase keys pending)</span>
+              </div>
+            )}
+
             {/* Phone Number or Email */}
             <div>
               <label className="text-xs font-medium text-gray-700 block mb-1">

@@ -158,3 +158,24 @@ body {
   padding: 0.25rem 0.625rem;
   border-radius: 0.5rem;
 }
+
+/* AI Scanner Animation */
+@keyframes laserScan {
+  0% {
+    top: 0%;
+    opacity: 0.75;
+  }
+  50% {
+    top: 95%;
+    opacity: 1;
+  }
+  100% {
+    top: 0%;
+    opacity: 0.75;
+  }
+}
+
+.animate-laser-scan {
+  animation: laserScan 2.2s ease-in-out infinite;
+}
+

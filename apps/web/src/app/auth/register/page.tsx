@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronDown, Globe } from "lucide-react";
+import { ChevronDown, Globe, AlertCircle, CheckCircle2, Info } from "lucide-react";
 import { ZoneItem } from "@gebere/shared";
 import { setAuthToken, setDemoMode, apiClient } from "@/lib/api-client";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -18,6 +19,13 @@ export default function RegisterPage() {
   const [topLanguage, setTopLanguage] = useState("English");
   const [isTopLangOpen, setIsTopLangOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [hasSupabaseKeys, setHasSupabaseKeys] = useState(false);
+
+  useEffect(() => {
+    setHasSupabaseKeys(isSupabaseConfigured());
+  }, []);
 
   useEffect(() => {
     async function loadZones() {
@@ -36,25 +44,79 @@ export default function RegisterPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMsg(null);
+    setSuccessMsg(null);
 
-    try {
-      setAuthToken("demo-user-farmer-1");
-      setDemoMode(true);
+    const email = identifier.includes("@") ? identifier.trim() : `${identifier.trim()}@oomisha360.et`;
 
-      const matched = zones.find((z) => z.name === farmLocation);
-      await apiClient.updateProfile({
-        fullName: fullName || "Farmer Abebe",
-        phone: identifier.includes("@") ? undefined : identifier,
-        region: (matched as any)?.region || "Ethiopia",
-        zone: farmLocation,
-      });
+    if (isSupabaseConfigured()) {
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              fullName: fullName.trim() || "Farmer Member",
+              zone: farmLocation,
+              language,
+              role: "farmer",
+            },
+          },
+        });
 
-      router.push("/farms");
-    } catch (err) {
-      console.error("Registration failed", err);
-      router.push("/farms");
-    } finally {
-      setLoading(false);
+        if (error) {
+          setErrorMsg(error.message);
+          setLoading(false);
+          return;
+        }
+
+        if (data.session) {
+          setAuthToken(data.session.access_token);
+          setDemoMode(false);
+
+          const matched = zones.find((z) => z.name === farmLocation);
+          await apiClient.updateProfile({
+            fullName: fullName || "Farmer Abebe",
+            phone: identifier.includes("@") ? undefined : identifier,
+            region: (matched as any)?.region || "Ethiopia",
+            zone: farmLocation,
+          });
+
+          router.push("/farms");
+          return;
+        }
+
+        if (data.user) {
+          setSuccessMsg("Registration successful! If confirmation is required, please check your email inbox to verify your account before logging in.");
+          setLoading(false);
+          return;
+        }
+      } catch (err: any) {
+        setErrorMsg(err.message || "Failed to create Supabase account.");
+        setLoading(false);
+        return;
+      }
+    } else {
+      // Development demo fallback
+      try {
+        setAuthToken("demo-user-farmer-1");
+        setDemoMode(true);
+
+        const matched = zones.find((z) => z.name === farmLocation);
+        await apiClient.updateProfile({
+          fullName: fullName || "Farmer Abebe",
+          phone: identifier.includes("@") ? undefined : identifier,
+          region: (matched as any)?.region || "Ethiopia",
+          zone: farmLocation,
+        });
+
+        router.push("/farms");
+      } catch (err) {
+        console.error("Registration failed", err);
+        router.push("/farms");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -125,6 +187,30 @@ export default function RegisterPage() {
           </h2>
 
           <form onSubmit={handleRegister} className="space-y-4">
+            {errorMsg && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-3.5 py-2.5 rounded-xl text-xs flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
+            {successMsg && (
+              <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-3.5 py-2.5 rounded-xl text-xs flex items-start gap-2">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                <span>{successMsg}</span>
+              </div>
+            )}
+            {hasSupabaseKeys ? (
+              <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-1.5 rounded-xl text-[11px] flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                <span>Connected to Supabase Auth GoTrue</span>
+              </div>
+            ) : (
+              <div className="bg-amber-50 border border-amber-200 text-amber-800 px-3 py-1.5 rounded-xl text-[11px] flex items-center gap-1.5">
+                <Info className="h-3.5 w-3.5 text-amber-600 shrink-0" />
+                <span>Development demo mode (Supabase keys pending)</span>
+              </div>
+            )}
+
             {/* Full Name */}
             <div>
               <input

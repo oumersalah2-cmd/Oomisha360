@@ -13,17 +13,76 @@ import type {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export let prisma: any = null;
 export let isUsingPrisma = false;
+export let dbConnectionError: string | null = null;
 
-if (config.databaseUrl && !config.databaseUrl.includes('your-db-password')) {
+// Sanitize database connection strings and error messages so credentials never leak
+export function sanitizeDbError(msg: string): string {
+  if (!msg) return 'Unknown database error';
+  return msg.replace(/(postgres(?:ql)?:\/\/[^:]+:)[^@]+(@)/gi, '$1*****$2');
+}
+
+// Check whether a real PostgreSQL DATABASE_URL is provided (not empty and not the default template)
+export const isConfiguredWithRealDatabase = Boolean(
+  config.databaseUrl && !config.databaseUrl.includes('your-db-password') && !config.databaseUrl.includes('db.supabase.co:5432')
+);
+
+if (isConfiguredWithRealDatabase) {
+  isUsingPrisma = true;
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { PrismaClient } = require('@prisma/client');
-    prisma = new PrismaClient();
-    isUsingPrisma = true;
-  } catch (err) {
-    console.warn('[DB] Could not initialize PrismaClient. Falling back to in-memory store:', err);
+    prisma = new PrismaClient({
+      datasources: { db: { url: config.databaseUrl } },
+      log: config.isProduction ? ['error', 'warn'] : ['error', 'warn'],
+    });
+  } catch (err: any) {
+    dbConnectionError = sanitizeDbError(err?.message || 'Failed to initialize PrismaClient');
+    console.error('[DATABASE ERROR] Failed to initialize PrismaClient:', dbConnectionError);
+    // Explicitly DO NOT fall back to in-memory mode when DATABASE_URL is explicitly configured!
     prisma = null;
-    isUsingPrisma = false;
+    isUsingPrisma = true;
+  }
+} else {
+  // Only use in-memory store in local development when no database URL is supplied
+  isUsingPrisma = false;
+}
+
+export async function testDbConnection(): Promise<{ connected: boolean; error?: string; latencyMs?: number }> {
+  if (!isConfiguredWithRealDatabase) {
+    return { connected: false, error: 'DATABASE_URL is not configured with real Supabase credentials' };
+  }
+  if (!prisma) {
+    return { connected: false, error: dbConnectionError || 'Prisma client is not instantiated' };
+  }
+  const start = Date.now();
+  try {
+    await prisma.$queryRaw`SELECT 1 as connected`;
+    return { connected: true, latencyMs: Date.now() - start };
+  } catch (err: any) {
+    const sanitized = sanitizeDbError(err?.message || 'Database query failed');
+    return { connected: false, error: sanitized };
+  }
+}
+
+export async function ensureUserProfile(user: { id: string; email?: string; role?: string; fullName?: string }): Promise<void> {
+  if (isUsingPrisma && prisma) {
+    const existing = await prisma.userProfile.findUnique({ where: { id: user.id } });
+    if (existing) return;
+
+    let email = user.email || `${user.id}@geberevision.et`;
+    const emailConflict = await prisma.userProfile.findUnique({ where: { email } });
+    if (emailConflict) {
+      email = `${user.id}.${Date.now()}@geberevision.et`;
+    }
+
+    await prisma.userProfile.create({
+      data: {
+        id: user.id,
+        email,
+        fullName: user.fullName || email.split('@')[0] || 'Farmer User',
+        role: user.role || 'farmer',
+      },
+    });
   }
 }
 

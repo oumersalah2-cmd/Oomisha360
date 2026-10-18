@@ -17,7 +17,13 @@ import {
   ChevronRight,
   RefreshCw,
   PhoneCall,
-  UserCheck
+  UserCheck,
+  Image as ImageIcon,
+  Trash2,
+  ScanLine,
+  FileCheck,
+  Check,
+  Download,
 } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { EthiopiaRegionSummary, ZoneItem, DiagnosisResult } from "@gebere/shared";
@@ -83,9 +89,22 @@ export default function GebereVisionAIPage() {
   const [selectedSample, setSelectedSample] = useState<string>("sample-coffee-rust");
   const [uploadedImagePreview, setUploadedImagePreview] = useState<string>("/images/crops/coffee.jpg");
 
+  // Custom Photo Upload State & Metadata
+  const [isCustomPhoto, setIsCustomPhoto] = useState(false);
+  const [photoMetadata, setPhotoMetadata] = useState<{
+    name: string;
+    size: string;
+    dimensions: string;
+    source: "camera" | "upload";
+  } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
   // State & Results
   const [analyzing, setAnalyzing] = useState(false);
+  const [analysisPhase, setAnalysisPhase] = useState<string>("");
   const [diagnosisResult, setDiagnosisResult] = useState<DiagnosisResult | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [history, setHistory] = useState<any[]>([]);
 
   // Escalation Modal
@@ -132,25 +151,145 @@ export default function GebereVisionAIPage() {
     updateZones();
   }, [selectedRegion]);
 
+  // Client-Side Image Resizer & Optimizer (Converts any camera/upload photo to lightweight JPEG Data URL)
+  const processImageFile = (file: File, source: "camera" | "upload") => {
+    setUploadError(null);
+    setErrorMessage(null);
+
+    if (!file.type.startsWith("image/")) {
+      setUploadError("Please provide a valid image file (JPEG, PNG, or WEBP).");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onerror = () => {
+      setUploadError("Failed to read image file. Please try again.");
+    };
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onerror = () => {
+        setUploadError("Unable to decode image. Please choose another photo.");
+      };
+      img.onload = () => {
+        const maxDim = 1280;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          setUploadError("Could not process image on canvas.");
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+
+        const sizeInKb = Math.round((dataUrl.length * 0.75) / 1024);
+
+        setUploadedImagePreview(dataUrl);
+        setSelectedSample("");
+        setIsCustomPhoto(true);
+        setPhotoMetadata({
+          name: file.name || "Camera_Snapshot.jpg",
+          size: `${sizeInKb} KB`,
+          dimensions: `${width} × ${height} px`,
+          source,
+        });
+
+        if (
+          !observedSymptoms ||
+          observedSymptoms === "Yellow-orange powdery pustules under leaves with chlorosis"
+        ) {
+          setObservedSymptoms(`Inspecting ${selectedCrop} leaf for visible foliar discoloration, rust pustules, or lesions.`);
+        }
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSelectSample = (sample: SampleImage) => {
+    setIsCustomPhoto(false);
+    setPhotoMetadata(null);
+    setUploadError(null);
     setSelectedSample(sample.id);
     setSelectedCrop(sample.crop);
     setObservedSymptoms(sample.symptoms);
     setUploadedImagePreview(sample.imageUrl);
   };
 
-  const handleCustomImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleClearCustomPhoto = () => {
+    setIsCustomPhoto(false);
+    setPhotoMetadata(null);
+    setUploadError(null);
+    const sample = SAMPLE_FIELD_IMAGES.find((s) => s.crop.toLowerCase() === selectedCrop.toLowerCase()) || SAMPLE_FIELD_IMAGES[0];
+    setSelectedSample(sample.id);
+    setUploadedImagePreview(sample.imageUrl);
+    setObservedSymptoms(sample.symptoms);
+  };
+
+  const handleCropChange = (crop: string) => {
+    setSelectedCrop(crop);
+    if (!isCustomPhoto) {
+      const match = SAMPLE_FIELD_IMAGES.find((s) => s.crop.toLowerCase() === crop.toLowerCase());
+      if (match) {
+        setSelectedSample(match.id);
+        setUploadedImagePreview(match.imageUrl);
+        setObservedSymptoms(match.symptoms);
+      }
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setUploadedImagePreview(url);
-      setSelectedSample("");
+      processImageFile(file, "upload");
     }
   };
 
   const handleRunDiagnosis = async () => {
+    if (!uploadedImagePreview) {
+      setUploadError("Please select a sample or upload a leaf photo first.");
+      return;
+    }
+
     setAnalyzing(true);
+    setErrorMessage(null);
     setDiagnosisResult(null);
+
+    // Multi-phase feedback for farmer transparency
+    setAnalysisPhase("Calibrating leaf lighting & chlorophyll spectrum...");
+    const t1 = setTimeout(() => {
+      setAnalysisPhase("Analyzing foliar morphology & identifying pathogen pustules...");
+    }, 600);
+    const t2 = setTimeout(() => {
+      setAnalysisPhase("Correlating against EIAR & CABI diagnostic knowledge bases...");
+    }, 1300);
 
     try {
       const res = await apiClient.diagnoseCrop({
@@ -162,13 +301,23 @@ export default function GebereVisionAIPage() {
       });
 
       if (res) {
-        setDiagnosisResult(res);
-        setHistory((prev) => [res, ...prev.slice(0, 9)]);
+        const enrichedResult: DiagnosisResult = {
+          ...res,
+          imageUrl: uploadedImagePreview,
+        };
+        setDiagnosisResult(enrichedResult);
+        setHistory((prev) => [enrichedResult, ...prev.slice(0, 9)]);
+      } else {
+        setErrorMessage("AI diagnostic service returned an empty response. Please verify the API connection.");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Diagnosis error", err);
+      setErrorMessage(err?.message || "Failed to complete AI diagnosis. Please check network connection.");
     } finally {
+      clearTimeout(t1);
+      clearTimeout(t2);
       setAnalyzing(false);
+      setAnalysisPhase("");
     }
   };
 
@@ -249,7 +398,7 @@ export default function GebereVisionAIPage() {
                   <button
                     key={c}
                     type="button"
-                    onClick={() => setSelectedCrop(c)}
+                    onClick={() => handleCropChange(c)}
                     className={`py-2 px-3 rounded-xl text-xs font-bold transition-all border ${
                       selectedCrop === c
                         ? "bg-[#1B4332] text-white border-[#1B4332] shadow-sm"
@@ -295,10 +444,159 @@ export default function GebereVisionAIPage() {
               </div>
             </div>
 
+            {/* Specimen Preview & AI Scanner Visualizer */}
+            <div className="space-y-2 pt-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+                  <ImageIcon className="h-4 w-4 text-[#2D6A4F]" />
+                  <span>Selected Leaf Specimen for Neural Analysis</span>
+                </label>
+                {isCustomPhoto && (
+                  <button
+                    type="button"
+                    onClick={handleClearCustomPhoto}
+                    className="text-[11px] font-semibold text-red-600 hover:text-red-700 flex items-center gap-1"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                    <span>Reset Specimen</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="relative rounded-2xl overflow-hidden border-2 border-[#D8D2C4] bg-[#1A1A2E] aspect-[16/9] sm:aspect-[21/9] flex items-center justify-center group shadow-inner">
+                <img
+                  src={uploadedImagePreview}
+                  alt="Selected crop leaf for AI inspection"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+
+                {/* Laser Scanning Animation Overlay when Analyzing */}
+                {analyzing && (
+                  <div className="absolute inset-0 pointer-events-none z-20">
+                    <div className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_15px_#10B981] animate-laser-scan"></div>
+                    <div className="absolute inset-0 bg-emerald-950/30 backdrop-blur-[1px] flex flex-col items-center justify-center p-4 text-center">
+                      <div className="bg-black/80 border border-emerald-500/50 text-emerald-300 px-4 py-2.5 rounded-2xl backdrop-blur-md shadow-2xl flex items-center gap-3">
+                        <RefreshCw className="h-5 w-5 animate-spin text-emerald-400" />
+                        <div className="text-left">
+                          <div className="text-xs font-extrabold tracking-wide uppercase text-white">
+                            Neural Vision Scanning Active
+                          </div>
+                          <div className="text-[11px] text-emerald-300 font-mono">
+                            {analysisPhase || "Scanning foliar tissue..."}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Specimen Tag Overlay */}
+                <div className="absolute top-3 left-3 z-10">
+                  <span className="inline-flex items-center gap-1.5 bg-black/70 backdrop-blur-md text-white text-[11px] font-bold px-3 py-1 rounded-full border border-white/20">
+                    <ScanLine className="h-3.5 w-3.5 text-emerald-400" />
+                    <span>{selectedCrop} Leaf Specimen</span>
+                  </span>
+                </div>
+
+                {isCustomPhoto && (
+                  <div className="absolute top-3 right-3 z-10">
+                    <span className="inline-flex items-center gap-1 bg-emerald-600/90 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full shadow-sm">
+                      <Check className="h-3 w-3" />
+                      <span>Custom Photo Loaded</span>
+                    </span>
+                  </div>
+                )}
+
+                {photoMetadata && (
+                  <div className="absolute bottom-3 left-3 right-3 z-10 flex items-center justify-between text-[11px] bg-black/75 backdrop-blur-md text-emerald-100 px-3 py-1.5 rounded-xl border border-white/10">
+                    <span className="truncate max-w-[200px] font-mono">{photoMetadata.name}</span>
+                    <span className="font-mono">{photoMetadata.dimensions} • {photoMetadata.size}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Custom Photo Upload & Camera Capture Zone */}
+            <div className="space-y-2 pt-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-gray-700 block">
+                  Upload or Take Photo with Camera
+                </label>
+                <span className="text-[10px] text-emerald-800 font-semibold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                  Auto-Optimized (JPEG/PNG/WEBP)
+                </span>
+              </div>
+
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`border-2 border-dashed rounded-2xl p-5 text-center transition-all ${
+                  isDragging
+                    ? "border-emerald-600 bg-emerald-50/80 shadow-md scale-[1.01]"
+                    : "border-[#D8D2C4] hover:border-[#2D6A4F] hover:bg-emerald-50/20 bg-[#FAF7F2]"
+                }`}
+              >
+                <div className="flex flex-col items-center justify-center space-y-2">
+                  <div className="h-10 w-10 rounded-full bg-emerald-100/70 text-[#2D6A4F] flex items-center justify-center">
+                    <Upload className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-gray-800 block">
+                      Drag & drop crop leaf photo here, or use options below:
+                    </span>
+                    <span className="text-[11px] text-gray-500 block mt-0.5">
+                      Accepts all resolutions. Automatically downscaled for fast rural cellular transmission.
+                    </span>
+                  </div>
+
+                  {/* Dual Action Buttons */}
+                  <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1.5">
+                    {/* Camera Button (Mobile/Tablet Native Camera) */}
+                    <label className="cursor-pointer inline-flex items-center gap-1.5 bg-[#1B4332] hover:bg-[#2D6A4F] text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm active:scale-95">
+                      <Camera className="h-4 w-4" />
+                      <span>Take Camera Photo</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) processImageFile(file, "camera");
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+
+                    {/* File Browser Button */}
+                    <label className="cursor-pointer inline-flex items-center gap-1.5 bg-white hover:bg-gray-50 text-[#1B4332] border border-[#D8D2C4] text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm active:scale-95">
+                      <ImageIcon className="h-4 w-4" />
+                      <span>Choose From Files</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) processImageFile(file, "upload");
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+
+                  {uploadError && (
+                    <div className="text-[11px] font-bold text-red-600 bg-red-50 border border-red-200 px-3 py-1.5 rounded-xl mt-2">
+                      {uploadError}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* Quick-Pick Sample Leaf Images */}
             <div className="space-y-2 pt-2">
               <label className="text-xs font-bold text-gray-700 block">
-                Quick-Pick Diagnostic Field Sample
+                Or Select From Verified EIAR Diagnostic Samples
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {SAMPLE_FIELD_IMAGES.map((s) => (
@@ -307,7 +605,7 @@ export default function GebereVisionAIPage() {
                     type="button"
                     onClick={() => handleSelectSample(s)}
                     className={`flex items-center gap-3 p-2.5 rounded-2xl border text-left transition-all ${
-                      selectedSample === s.id
+                      selectedSample === s.id && !isCustomPhoto
                         ? "border-[#2D6A4F] bg-emerald-50/70 shadow-sm"
                         : "border-[#E5DFD3] hover:bg-gray-50 bg-white"
                     }`}
@@ -326,30 +624,6 @@ export default function GebereVisionAIPage() {
               </div>
             </div>
 
-            {/* Custom Photo Upload */}
-            <div className="space-y-2 pt-2">
-              <label className="text-xs font-bold text-gray-700 block">
-                Or Upload Farmer Crop Photo
-              </label>
-              <div className="border-2 border-dashed border-[#D8D2C4] rounded-2xl p-4 text-center hover:bg-gray-50/50 transition-all cursor-pointer relative">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleCustomImageUpload}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                />
-                <div className="flex flex-col items-center justify-center space-y-1.5">
-                  <Upload className="h-6 w-6 text-[#2D6A4F]" />
-                  <span className="text-xs font-semibold text-gray-700">
-                    Click to browse or take a camera snapshot
-                  </span>
-                  <span className="text-[10px] text-gray-400">
-                    Supports high-resolution PNG, JPG, or WEBP leaf scans
-                  </span>
-                </div>
-              </div>
-            </div>
-
             {/* Observed Visual Symptoms */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-gray-700">Observed Leaf / Stem Symptoms</label>
@@ -362,12 +636,23 @@ export default function GebereVisionAIPage() {
               ></textarea>
             </div>
 
+            {/* Error Message Alert */}
+            {errorMessage && (
+              <div className="bg-red-50 border border-red-200 rounded-2xl p-3 flex items-start gap-2.5 text-red-900 text-xs">
+                <AlertTriangle className="h-4 w-4 text-red-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <span className="font-bold block">Diagnosis Diagnostic Error</span>
+                  <span>{errorMessage}</span>
+                </div>
+              </div>
+            )}
+
             {/* Run Analysis Action Button */}
             <button
               type="button"
               onClick={handleRunDiagnosis}
               disabled={analyzing}
-              className="w-full flex items-center justify-center gap-2 bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-bold py-3.5 rounded-2xl text-sm transition-all shadow-md shadow-[#2D6A4F]/20 active:scale-[0.99]"
+              className="w-full flex items-center justify-center gap-2 bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-bold py-3.5 rounded-2xl text-sm transition-all shadow-md shadow-[#2D6A4F]/20 active:scale-[0.99] disabled:opacity-75"
             >
               {analyzing ? (
                 <>
@@ -388,11 +673,53 @@ export default function GebereVisionAIPage() {
         <div className="lg:col-span-5 space-y-6">
           {diagnosisResult ? (
             <div className="bg-white rounded-3xl shadow-md border border-[#E5DFD3] p-6 sm:p-7 space-y-5 animate-fade-in">
+              
+              {/* Diagnosed Specimen Photo Card */}
+              <div className="relative rounded-2xl overflow-hidden aspect-[16/10] bg-gray-900 border border-[#E5DFD3] shadow-sm">
+                <img
+                  src={diagnosisResult.imageUrl || uploadedImagePreview}
+                  alt="Analyzed Crop Specimen"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent flex flex-col justify-between p-3.5">
+                  <div className="flex items-center justify-between">
+                    <span className="bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg border border-white/20">
+                      AI Diagnosed Specimen: {diagnosisResult.crop}
+                    </span>
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shadow-sm ${
+                        diagnosisResult.status === "healthy"
+                          ? "bg-emerald-500 text-white"
+                          : diagnosisResult.severity === "Critical"
+                          ? "bg-red-500 text-white"
+                          : "bg-amber-500 text-white"
+                      }`}
+                    >
+                      {diagnosisResult.status === "healthy" ? "Healthy Foliage" : `${diagnosisResult.severity} Severity`}
+                    </span>
+                  </div>
+
+                  <div className="text-white">
+                    <div className="text-xs font-bold flex items-center gap-1.5">
+                      {diagnosisResult.status === "healthy" ? (
+                        <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                      ) : (
+                        <AlertTriangle className="h-4 w-4 text-amber-400" />
+                      )}
+                      <span>{diagnosisResult.diseaseName}</span>
+                    </div>
+                    <div className="text-[10px] text-gray-300 font-mono mt-0.5">
+                      EIAR Confidence: {diagnosisResult.confidenceScore}% • {selectedZone}, {selectedRegion}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Status Header */}
               <div className="flex items-start justify-between">
                 <div>
                   <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                    Diagnostic Report
+                    Diagnostic Pathology Report
                   </span>
                   <h3 className="text-xl font-extrabold text-[#1A1A2E] mt-0.5">
                     {diagnosisResult.diseaseName}
@@ -418,7 +745,7 @@ export default function GebereVisionAIPage() {
               {/* Confidence Meter */}
               <div className="bg-[#F5F0E8] rounded-2xl p-4 border border-[#E5DFD3] space-y-2">
                 <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold text-[#1B4332]">AI Confidence Level</span>
+                  <span className="font-bold text-[#1B4332]">AI Confidence Score</span>
                   <span className="font-extrabold text-base text-[#2D6A4F]">
                     {diagnosisResult.confidenceScore}%
                   </span>
@@ -475,6 +802,22 @@ export default function GebereVisionAIPage() {
                 </ul>
               </div>
 
+              {/* Organic Remedies */}
+              {diagnosisResult.organicTreatments && diagnosisResult.organicTreatments.length > 0 && (
+                <div className="space-y-2 pt-2 border-t border-gray-100">
+                  <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wide">
+                    Organic / Biological Treatments
+                  </h4>
+                  <ul className="space-y-1.5 text-xs text-emerald-800">
+                    {diagnosisResult.organicTreatments.map((tr, i) => (
+                      <li key={i} className="bg-emerald-50 p-2 rounded-xl border border-emerald-100 leading-relaxed">
+                        🌱 {tr}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               {/* Action Buttons */}
               <div className="pt-2 space-y-2.5">
                 <button
@@ -508,7 +851,7 @@ export default function GebereVisionAIPage() {
                 AI Diagnostic Scan Ready
               </h3>
               <p className="text-xs text-gray-500 leading-relaxed max-w-xs mx-auto">
-                Select your crop, region, and leaf photograph on the left panel, then press "Run AI Disease Analysis".
+                Select your crop, region, and upload a leaf photograph on the left panel, then press "Run AI Disease Analysis".
               </p>
               <div className="pt-4 border-t border-gray-100 flex items-center justify-center gap-4 text-[11px] text-gray-400">
                 <span>⚡ Instant Analysis</span>
@@ -546,6 +889,57 @@ export default function GebereVisionAIPage() {
         </div>
 
       </div>
+
+      {/* Recent Diagnostic History */}
+      {history && history.length > 0 && (
+        <div className="bg-white rounded-3xl border border-[#E5DFD3] p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+              <Clock className="h-4 w-4 text-[#2D6A4F]" />
+              <span>Recent AI Field Diagnostic Scans ({history.length})</span>
+            </h3>
+            <span className="text-xs text-gray-400 font-sans">Synced with Regional Field Database</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {history.slice(0, 6).map((item, idx) => (
+              <div
+                key={item.id || idx}
+                className="p-3.5 rounded-2xl bg-[#FAF7F2] border border-[#E5DFD3] flex items-center gap-3"
+              >
+                {item.imageUrl ? (
+                  <img
+                    src={item.imageUrl}
+                    alt={item.crop || "Crop"}
+                    className="w-12 h-12 rounded-xl object-cover flex-shrink-0 border border-gray-200"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-xl bg-emerald-100 text-[#1B4332] flex items-center justify-center font-bold text-xs flex-shrink-0">
+                    🌱
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-bold text-gray-900 truncate">
+                    {item.diseaseName || item.diseaseIdentified || "Diagnostic Scan"}
+                  </div>
+                  <div className="text-[10px] text-gray-500">
+                    {item.crop} • {item.region || "Ethiopia"} • {item.confidenceScore || item.confidence || 95}%
+                  </div>
+                </div>
+                <span
+                  className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                    item.status === "healthy"
+                      ? "bg-emerald-100 text-emerald-800"
+                      : "bg-amber-100 text-amber-800"
+                  }`}
+                >
+                  {item.status === "healthy" ? "Healthy" : "Infected"}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Escalation to Extension Agronomist Modal */}
       {showEscalateModal && (

@@ -20,11 +20,29 @@ export default function BotSimulator() {
   const [selectedLanguage, setSelectedLanguage] = useState<LangCode>("en");
   const [isDiagnosing, setIsDiagnosing] = useState(false);
   const [diagnosisResult, setDiagnosisResult] = useState<Disease | null>(diseases[0]);
+  const [customPhotoUrl, setCustomPhotoUrl] = useState<string | null>(null);
+  const [customPhotoName, setCustomPhotoName] = useState<string | null>(null);
   
   // Audio state
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioProgress, setAudioProgress] = useState(0);
   const audioIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleCustomPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const url = ev.target?.result as string;
+      setCustomPhotoUrl(url);
+      setCustomPhotoName(file.name);
+      runDiagnosis({
+        ...selectedDisease,
+        imagePlaceholder: url,
+      });
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Trigger diagnostic simulation
   const runDiagnosis = (disease: Disease) => {
@@ -209,15 +227,21 @@ export default function BotSimulator() {
         </div>
 
         {/* Upload simulated image */}
-        <div className="border-2 border-dashed border-zinc-800 rounded-xl p-4 text-center cursor-pointer hover:border-emerald-green/40 transition-colors">
-          <Upload className="h-6 w-6 text-zinc-500 mx-auto mb-2" />
-          <span className="text-xs text-zinc-400 font-medium block">
-            Upload custom leaf photo
+        <label className="border-2 border-dashed border-zinc-800 rounded-xl p-4 text-center cursor-pointer hover:border-emerald-green/40 transition-colors block relative group">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleCustomPhotoUpload}
+            className="absolute inset-0 opacity-0 cursor-pointer"
+          />
+          <Upload className="h-6 w-6 text-zinc-500 mx-auto mb-2 group-hover:text-emerald-green transition-colors" />
+          <span className="text-xs text-zinc-300 font-semibold block">
+            {customPhotoName ? `Uploaded: ${customPhotoName}` : "Upload custom leaf photo"}
           </span>
-          <span className="text-[10px] text-zinc-600 block mt-0.5">
-            Supports PNG, JPG up to 10MB
+          <span className="text-[10px] text-zinc-500 block mt-0.5">
+            Click to choose leaf photo (Auto-processed)
           </span>
-        </div>
+        </label>
       </div>
 
       {/* Simulated Device Screen (Right/Bottom) */}
@@ -246,7 +270,7 @@ export default function BotSimulator() {
             <div className="self-end max-w-[85%] bg-emerald-green text-obsidian rounded-2xl rounded-tr-sm p-2 flex flex-col gap-1.5 shadow-lg">
               <div className="rounded-lg overflow-hidden h-28 bg-emerald-green-dark">
                 <img
-                  src={selectedDisease.imagePlaceholder}
+                  src={customPhotoUrl || selectedDisease.imagePlaceholder}
                   alt="Crop Leaf"
                   className="w-full h-full object-cover"
                 />

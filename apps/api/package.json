@@ -6,7 +6,7 @@
     "dev": "tsc && node dist/server.js",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "node --test src/tests/api.test.cjs",
+    "test": "node --test src/tests/*.test.cjs",
     "typecheck": "tsc --noEmit",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev"

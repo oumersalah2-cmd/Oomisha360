@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { UserProfile } from "@gebere/shared";
-import { apiClient, isDemoMode, setDemoMode, setAuthToken } from "@/lib/api-client";
+import { apiClient, isDemoMode, setDemoMode, setAuthToken, clearAuthSession } from "@/lib/api-client";
+import { supabase } from "@/lib/supabase/client";
 import {
   User,
   ShieldCheck,
@@ -10,7 +12,8 @@ import {
   CheckCircle2,
   Sparkles,
   LogOut,
-  ChevronDown
+  ChevronDown,
+  Key
 } from "lucide-react";
 
 export default function UserProfilePage() {
@@ -24,6 +27,15 @@ export default function UserProfilePage() {
   const [role, setRole] = useState<UserProfile["role"]>("farmer");
   const [demoActive, setDemoActive] = useState(true);
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch {}
+    clearAuthSession();
+    router.push("/auth/login");
+  };
 
   useEffect(() => {
     async function load() {
@@ -214,6 +226,32 @@ export default function UserProfilePage() {
             </button>
           </div>
         </form>
+      </div>
+
+      {/* Account Session & Security Card */}
+      <div className="bg-white rounded-2xl shadow-sm border border-[#E5DFD3] p-6 space-y-4">
+        <div className="flex items-center gap-2 text-gray-900">
+          <Key className="h-4 w-4 text-[#2D6A4F]" />
+          <h2 className="text-sm font-bold">Account Session & Security</h2>
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-[#F5F0E8] border border-[#D8D2C4]">
+          <div className="space-y-1">
+            <span className="text-xs font-bold text-gray-900 block">
+              {profile?.email || "No active email"}
+            </span>
+            <span className="text-[11px] text-gray-500 block">
+              User ID: <code className="font-mono text-gray-700">{profile?.id || "Unregistered"}</code>
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="inline-flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-semibold px-4 py-2 rounded-xl text-xs transition-colors self-start sm:self-auto"
+          >
+            <LogOut className="h-4 w-4" />
+            <span>Sign Out & End Session</span>
+          </button>
+        </div>
       </div>
 
     </div>

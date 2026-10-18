@@ -8,7 +8,7 @@ import {
   MarketplaceListing,
   MarketplaceInquiry,
 } from '@gebere/shared';
-import { inMemoryStore, isUsingPrisma, prisma } from '../../lib/db';
+import { inMemoryStore, isUsingPrisma, prisma, ensureUserProfile } from '../../lib/db';
 import { NotFoundError, ForbiddenError } from '../../middleware/errorHandler';
 
 export const marketplaceRouter = Router();
@@ -125,6 +125,7 @@ marketplaceRouter.post(
       const data = req.body;
 
       if (isUsingPrisma && prisma) {
+        await ensureUserProfile(req.user!);
         const created = await prisma.marketplaceListing.create({
           data: {
             ...data,

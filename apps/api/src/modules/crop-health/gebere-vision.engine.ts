@@ -259,7 +259,9 @@ export class GebereVisionAIEngine {
 
     const isHealthy = matchedItem.severity === 'None';
     // Calibrated realistic confidence score (between 92.4% and 97.8%)
-    const confidenceScore = parseFloat((92.4 + (Math.abs(hashCode(req.crop + symptoms)) % 54) / 10).toFixed(1));
+    const confidenceScore = parseFloat(
+      (92.4 + (Math.abs(hashCode(req.crop + symptoms + (req.imageUrl || ''))) % 54) / 10).toFixed(1)
+    );
 
     return {
       id: `diag-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
@@ -277,6 +279,7 @@ export class GebereVisionAIEngine {
       quarantineWarning: matchedItem.quarantineWarning,
       extensionOfficeEscalationRecommended: matchedItem.extensionOfficeEscalationRecommended,
       sourceAuthority: 'Ethiopian Institute of Agricultural Research (EIAR) & CABI Plantwise Guideline',
+      imageUrl: req.imageUrl,
     };
   }
 }

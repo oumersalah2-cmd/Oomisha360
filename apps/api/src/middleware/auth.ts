@@ -18,13 +18,28 @@ declare global {
   }
 }
 
-// Initialize Supabase admin client if keys are provided
-const supabaseAdmin =
-  config.supabase.url && config.supabase.serviceRoleKey
-    ? createClient(config.supabase.url, config.supabase.serviceRoleKey, {
-        auth: { autoRefreshToken: false, persistSession: false },
-      })
-    : null;
+const configuredAuthKey =
+  config.supabase.serviceRoleKey &&
+  config.supabase.serviceRoleKey !== 'your-supabase-service-role-key' &&
+  !config.supabase.serviceRoleKey.includes('placeholder')
+    ? config.supabase.serviceRoleKey
+    : config.supabase.anonKey &&
+      config.supabase.anonKey !== 'your-supabase-anon-key' &&
+      !config.supabase.anonKey.includes('placeholder')
+    ? config.supabase.anonKey
+    : '';
+
+// Check whether real Supabase Auth keys are configured
+export const isSupabaseAuthConfigured = Boolean(
+  config.supabase.url && configuredAuthKey
+);
+
+// Initialize Supabase admin/verification client if keys are valid
+export const supabaseAdmin = isSupabaseAuthConfigured
+  ? createClient(config.supabase.url, configuredAuthKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    })
+  : null;
 
 /**
  * Extracts and verifies the authenticated user from the Authorization Bearer header.
@@ -34,26 +49,45 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
   const authHeader = req.headers.authorization;
   const demoUserId = req.headers['x-demo-user-id'] as string | undefined;
 
-  // 1. Check for standard Bearer Token
+  // 1. Strict Production Enforcement: Reject all demo tokens and demo headers
+  if (config.isProduction) {
+    if (demoUserId) {
+      return next(new UnauthorizedError('Demo authentication headers are strictly prohibited in production.'));
+    }
+    if (authHeader) {
+      const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+      if (token === 'demo-token' || token.startsWith('demo-user-')) {
+        return next(new UnauthorizedError('Demo authentication tokens are strictly prohibited in production.'));
+      }
+    }
+    if (!isSupabaseAuthConfigured || !supabaseAdmin) {
+      return next(
+        new UnauthorizedError('Authentication service is misconfigured or unavailable in production.')
+      );
+    }
+  }
+
+  // 2. Check for Bearer Token
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.substring(7).trim();
 
-    // Support local demo token if database/Supabase is unconfigured
-    if (token === 'demo-token' || token.startsWith('demo-user-')) {
+    // In development/test mode, allow explicitly tagged demo tokens
+    if (!config.isProduction && (token === 'demo-token' || token.startsWith('demo-user-'))) {
+      const id = demoUserId || (token.startsWith('demo-user-') ? token.replace('demo-user-', '') : 'usr-demo-farmer-1');
       req.user = {
-        id: demoUserId || (token.startsWith('demo-user-') ? token.replace('demo-user-', '') : 'usr-demo-farmer-1'),
-        email: 'farmer.demo@geberevision.et',
+        id,
+        email: id === 'usr-demo-farmer-1' ? 'farmer.demo@geberevision.et' : `${id}@geberevision.et`,
         role: 'farmer',
       };
       return next();
     }
 
-    // If Supabase is configured, verify cryptographically with Supabase
+    // Verify token with real Supabase Auth GoTrue service
     if (supabaseAdmin) {
       try {
         const { data, error } = await supabaseAdmin.auth.getUser(token);
         if (error || !data.user) {
-          throw new UnauthorizedError('Invalid or expired authentication session.');
+          return next(new UnauthorizedError(error?.message || 'Invalid or expired authentication session.'));
         }
 
         req.user = {
@@ -62,22 +96,19 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
           role: (data.user.user_metadata?.role as AuthenticatedUser['role']) || 'farmer',
         };
         return next();
-      } catch (err) {
-        return next(err instanceof UnauthorizedError ? err : new UnauthorizedError('Session verification failed'));
+      } catch (err: any) {
+        return next(
+          err instanceof UnauthorizedError ? err : new UnauthorizedError('Session token verification failed.')
+        );
       }
-    } else {
-      // If Supabase is not configured yet, allow demo token session for development inspection
-      req.user = {
-        id: demoUserId || 'usr-demo-farmer-1',
-        email: 'farmer.demo@geberevision.et',
-        role: 'farmer',
-      };
-      return next();
     }
+
+    // If Supabase is unconfigured and token is not a recognized demo token, fail securely
+    return next(new UnauthorizedError('Invalid authentication token.'));
   }
 
-  // 2. Allow X-Demo-User-Id header during local development / testing
-  if (config.nodeEnv !== 'production' && demoUserId) {
+  // 3. In development/testing, check x-demo-user-id if no Authorization header provided
+  if (!config.isProduction && demoUserId) {
     req.user = {
       id: demoUserId,
       email: `${demoUserId}@geberevision.et`,
@@ -98,7 +129,8 @@ export async function optionalAuth(req: Request, res: Response, next: NextFuncti
 
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.substring(7).trim();
-    if (token === 'demo-token' || token.startsWith('demo-user-')) {
+
+    if (!config.isProduction && (token === 'demo-token' || token.startsWith('demo-user-'))) {
       req.user = {
         id: demoUserId || (token.startsWith('demo-user-') ? token.replace('demo-user-', '') : 'usr-demo-farmer-1'),
         email: 'farmer.demo@geberevision.et',
@@ -121,7 +153,7 @@ export async function optionalAuth(req: Request, res: Response, next: NextFuncti
         // Soft fail for optional auth
       }
     }
-  } else if (config.nodeEnv !== 'production' && demoUserId) {
+  } else if (!config.isProduction && demoUserId) {
     req.user = {
       id: demoUserId,
       email: `${demoUserId}@geberevision.et`,

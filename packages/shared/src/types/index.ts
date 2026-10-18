@@ -303,5 +303,6 @@ export interface DiagnosisResult {
   quarantineWarning?: string;
   extensionOfficeEscalationRecommended: boolean;
   sourceAuthority: string;
+  imageUrl?: string;
 }
 

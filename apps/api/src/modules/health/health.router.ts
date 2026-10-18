@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { isUsingPrisma, prisma } from '../../lib/db';
+import { isUsingPrisma, testDbConnection } from '../../lib/db';
 import { config } from '../../config';
 
 export const healthRouter = Router();
@@ -7,14 +7,19 @@ export const healthRouter = Router();
 healthRouter.get('/', async (req: Request, res: Response) => {
   let dbStatus = 'in-memory-active';
   let dbOk = true;
+  let dbError: string | undefined = undefined;
+  let latencyMs: number | undefined = undefined;
 
-  if (isUsingPrisma && prisma) {
-    try {
-      await prisma.$queryRaw`SELECT 1`;
+  if (isUsingPrisma) {
+    const testResult = await testDbConnection();
+    if (testResult.connected) {
       dbStatus = 'postgresql-connected';
-    } catch {
+      dbOk = true;
+      latencyMs = testResult.latencyMs;
+    } else {
       dbStatus = 'postgresql-error';
       dbOk = false;
+      dbError = testResult.error;
     }
   }
 
@@ -28,6 +33,8 @@ healthRouter.get('/', async (req: Request, res: Response) => {
     database: {
       status: dbStatus,
       isPrisma: isUsingPrisma,
+      ...(latencyMs !== undefined ? { latencyMs } : {}),
+      ...(dbError ? { error: dbError } : {}),
     },
   });
 });
