@@ -105,14 +105,19 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const navItems = [
     {
-      name: language === "om" ? "Shakallii Lafaa" : language === "am" ? "የመሬት ስሌት" : "Land Calculator",
-      href: "/land-calculator",
-      icon: Calculator,
+      name: language === "om" ? "Daashboordii" : language === "am" ? "ዳሽቦርድ" : "Dashboard",
+      href: "/dashboard",
+      icon: LayoutDashboard,
     },
     {
       name: language === "om" ? "Maasii Koo" : language === "am" ? "ማሳዬ" : "My Farm",
       href: "/farms",
       icon: Home,
+    },
+    {
+      name: language === "om" ? "Shakallii Lafaa" : language === "am" ? "የመሬት ስሌት" : "Land Calculator",
+      href: "/land-calculator",
+      icon: Calculator,
     },
     {
       name: language === "om" ? "Oomishaalee" : language === "am" ? "ሰብሎች" : "Crops",

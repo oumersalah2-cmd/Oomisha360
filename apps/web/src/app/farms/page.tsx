@@ -312,19 +312,31 @@ export default function MyFarmPage() {
 
             {/* Land Area */}
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-gray-800">Land Area</label>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-semibold text-gray-800">
+                  Land Area in Square Meters (m²)
+                </label>
+                {parseFloat(landArea) > 0 && (
+                  <span className="text-xs font-semibold text-[#1B4332] bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                    {(parseFloat(landArea) / 10000).toFixed(2)} ha • ≈ {(parseFloat(landArea) / 2500).toFixed(1)} Timad/Qada
+                  </span>
+                )}
+              </div>
               <div className="relative">
                 <input
                   type="number"
                   value={landArea}
                   onChange={(e) => setLandArea(e.target.value)}
-                  placeholder="3977"
+                  placeholder="e.g. 10000"
                   className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 pr-20 text-sm text-gray-900 focus:outline-none focus:border-[#2D6A4F] focus:ring-1 focus:ring-[#2D6A4F]"
                 />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-medium text-gray-500">
-                  Meters
+                  m²
                 </span>
               </div>
+              <p className="text-[11px] text-gray-500">
+                1 Hectare (ha) = 10,000 m² • 1 Timad / Qada ≈ 2,500 m² (0.25 ha)
+              </p>
             </div>
 
             {/* Crop Selection Checkboxes matching Image 2B */}
@@ -432,14 +444,21 @@ export default function MyFarmPage() {
               </div>
             </div>
 
-            {/* Start Button */}
+            {/* Save Farm Profile Button */}
             <div className="pt-3">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#40916C] hover:bg-[#2D6A4F] text-white font-medium py-3 rounded-xl text-sm transition-all shadow-md shadow-[#2D6A4F]/20 active:scale-[0.99]"
+                className="w-full bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-semibold py-3.5 rounded-xl text-sm transition-all shadow-md shadow-[#2D6A4F]/20 active:scale-[0.99] disabled:opacity-75 flex items-center justify-center gap-2"
               >
-                {loading ? "Registering Farm..." : "Start"}
+                {loading ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                    <span>Saving Farm Profile...</span>
+                  </>
+                ) : (
+                  <span>Save Farm Profile</span>
+                )}
               </button>
             </div>
           </form>
@@ -669,22 +688,26 @@ export default function MyFarmPage() {
                         {plot.areaHectares.toFixed(3)} ha
                       </td>
                       <td className="py-3 pl-4 text-right">
-                        <div className="inline-flex items-center gap-1.5">
+                        <div className="inline-flex items-center gap-2">
                           <button
                             type="button"
                             onClick={() => openEditPlot(plot)}
                             title="Edit Plot"
-                            className="p-1.5 text-gray-500 hover:text-[#2D6A4F] hover:bg-emerald-50 rounded-lg transition-colors"
+                            aria-label={`Edit plot ${plot.plotName}`}
+                            className="inline-flex items-center gap-1 min-h-[36px] px-2.5 py-1.5 text-gray-600 hover:text-[#2D6A4F] hover:bg-emerald-50 rounded-lg border border-transparent hover:border-emerald-200 transition-colors font-medium text-xs"
                           >
                             <Edit2 className="h-3.5 w-3.5" />
+                            <span className="hidden sm:inline">Edit</span>
                           </button>
                           <button
                             type="button"
                             onClick={() => handleDeletePlot(plot.id, plot.plotName)}
                             title="Delete Plot"
-                            className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            aria-label={`Delete plot ${plot.plotName}`}
+                            className="inline-flex items-center gap-1 min-h-[36px] px-2.5 py-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-200 transition-colors font-medium text-xs"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
+                            <span className="hidden sm:inline">Delete</span>
                           </button>
                         </div>
                       </td>

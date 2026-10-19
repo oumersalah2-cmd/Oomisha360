@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   Expense,
   ExpenseCategory,
@@ -20,7 +21,8 @@ import {
   CheckCircle2,
   AlertCircle,
   TrendingDown,
-  ChevronDown
+  ChevronDown,
+  Sprout
 } from "lucide-react";
 
 export default function FarmExpensesPage() {
@@ -54,9 +56,19 @@ export default function FarmExpensesPage() {
 
   const handleAddExpense = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!farmId) {
+      setErrorMsg("Please select or register a farm profile before recording an expense.");
+      setStatusMsg(null);
+      return;
+    }
+    if (!description.trim()) {
+      setErrorMsg("Please enter an expense description (e.g. Urea fertilizer, Certified wheat seed).");
+      setStatusMsg(null);
+      return;
+    }
     const numAmount = parseFloat(amount);
-    if (!farmId || !description || isNaN(numAmount) || numAmount <= 0) {
-      setErrorMsg("Please fill all fields with valid positive amounts.");
+    if (isNaN(numAmount) || numAmount <= 0) {
+      setErrorMsg("Please enter a valid expense amount in ETB greater than zero.");
       setStatusMsg(null);
       return;
     }
@@ -131,6 +143,30 @@ export default function FarmExpensesPage() {
         </div>
       )}
 
+      {/* Empty State Banner if no farms exist */}
+      {farms.length === 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="p-2.5 bg-amber-100 rounded-xl text-amber-800 shrink-0 mt-0.5">
+              <Sprout className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-amber-950">No Farm Profile Registered</h3>
+              <p className="text-xs text-amber-900/80 mt-0.5">
+                Every input expense must be linked to a registered farm parcel. Please create your farm profile first.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/farms"
+            className="inline-flex items-center gap-1.5 bg-[#2D6A4F] hover:bg-[#1B4332] text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm shrink-0"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Register Farm Profile</span>
+          </Link>
+        </div>
+      )}
+
       {/* Add Expense Form Card */}
       {isAdding && (
         <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#E5DFD3] shadow-md space-y-5 animate-fade-in">
@@ -141,15 +177,24 @@ export default function FarmExpensesPage() {
           <form onSubmit={handleAddExpense} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-gray-700">Farm</label>
-              <select
-                value={farmId}
-                onChange={(e) => setFarmId(e.target.value)}
-                className="w-full bg-[#F5F0E8] border border-[#D8D2C4] rounded-xl px-3 py-2 text-xs font-medium text-gray-900 focus:outline-none focus:border-[#2D6A4F]"
-              >
-                {farms.map((f) => (
-                  <option key={f.id} value={f.id}>{f.name}</option>
-                ))}
-              </select>
+              {farms.length === 0 ? (
+                <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-center justify-between">
+                  <span>No farm registered</span>
+                  <Link href="/farms" className="text-[#2D6A4F] font-bold hover:underline">
+                    Add Farm →
+                  </Link>
+                </div>
+              ) : (
+                <select
+                  value={farmId}
+                  onChange={(e) => setFarmId(e.target.value)}
+                  className="w-full bg-[#F5F0E8] border border-[#D8D2C4] rounded-xl px-3 py-2 text-xs font-medium text-gray-900 focus:outline-none focus:border-[#2D6A4F]"
+                >
+                  {farms.map((f) => (
+                    <option key={f.id} value={f.id}>{f.name}</option>
+                  ))}
+                </select>
+              )}
             </div>
 
             <div className="space-y-1.5">

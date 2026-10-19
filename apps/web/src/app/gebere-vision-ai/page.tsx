@@ -381,10 +381,15 @@ export default function GebereVisionAIPage() {
       
       {/* Hero Header */}
       <div className="bg-gradient-to-r from-[#1B4332] via-[#23533E] to-[#2D6A4F] rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
-        <div className="relative z-10 space-y-3 max-w-3xl">
-          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-emerald-200">
-            <Sparkles className="h-3.5 w-3.5 text-emerald-300" />
-            <span>AI Agricultural Diagnostic Engine</span>
+        <div className="relative z-10 space-y-3.5 max-w-3xl">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-emerald-200">
+              <Sparkles className="h-3.5 w-3.5 text-emerald-300" />
+              <span>AI Agricultural Diagnostic Assistant</span>
+            </div>
+            <span className="bg-amber-400/20 text-amber-200 border border-amber-300/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">
+              Pilot Advisory Tool (Experimental)
+            </span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
@@ -392,10 +397,18 @@ export default function GebereVisionAIPage() {
           </h1>
           <p className="text-sm sm:text-base text-emerald-100/90 leading-relaxed font-sans">
             Specialized computer-vision crop pathology assistant for Ethiopian farmers.
-            Validated against Ethiopian Institute of Agricultural Research (EIAR) and CABI Plantwise diagnostics.
+            Calibrated against Ethiopian Institute of Agricultural Research (EIAR) and CABI Plantwise diagnostics.
           </p>
 
-          <div className="flex flex-wrap gap-2 pt-2 text-xs">
+          {/* Safety & Non-Prescription Advisory */}
+          <div className="bg-white/10 border border-white/20 backdrop-blur-sm rounded-xl p-3 text-xs text-emerald-100 flex items-start gap-2.5">
+            <AlertTriangle className="h-4 w-4 text-amber-300 shrink-0 mt-0.5" />
+            <p className="leading-relaxed text-[11px]">
+              <strong>Official Non-Prescription Notice:</strong> All AI diagnoses are advisory and preliminary. They do not replace agronomic inspection or constitute chemical prescriptions. Always confirm economic damage thresholds with your local Kebele Agricultural Development Agent (DA) before purchasing or applying any crop protection products.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-2 pt-1 text-xs">
             <span className="bg-white/15 px-3 py-1 rounded-xl">✓ Coffee (Buna)</span>
             <span className="bg-white/15 px-3 py-1 rounded-xl">✓ Teff (Xaafii)</span>
             <span className="bg-white/15 px-3 py-1 rounded-xl">✓ Wheat (Qamadii)</span>
@@ -472,6 +485,17 @@ export default function GebereVisionAIPage() {
                   ))}
                 </select>
               </div>
+            </div>
+
+            {/* Field Photo Quality Guide */}
+            <div className="bg-[#F5F0E8] border border-[#E5DFD3] rounded-2xl p-3 text-xs space-y-1">
+              <span className="font-bold text-[#1B4332] flex items-center gap-1.5">
+                <CheckCircle2 className="h-3.5 w-3.5 text-[#2D6A4F]" />
+                Photo Quality Guidelines for Accurate Field Scouting:
+              </span>
+              <p className="text-[11px] text-gray-600 leading-relaxed">
+                ☀️ Clear natural daylight • 🌿 Close-up of single infected leaf • 🔍 Sharp focus on pustules or lesions • 🚫 Avoid blurry or shadowed photos
+              </p>
             </div>
 
             {/* Specimen Preview & AI Scanner Visualizer */}
@@ -772,10 +796,10 @@ export default function GebereVisionAIPage() {
                 </span>
               </div>
 
-              {/* Confidence Meter */}
-              <div className="bg-[#F5F0E8] rounded-2xl p-4 border border-[#E5DFD3] space-y-2">
+              {/* Confidence & Reliability Context */}
+              <div className="bg-[#F5F0E8] rounded-2xl p-4 border border-[#E5DFD3] space-y-2.5">
                 <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold text-[#1B4332]">AI Confidence Score</span>
+                  <span className="font-bold text-[#1B4332]">AI Match Likelihood</span>
                   <span className="font-extrabold text-base text-[#2D6A4F]">
                     {diagnosisResult.confidenceScore}%
                   </span>
@@ -786,9 +810,16 @@ export default function GebereVisionAIPage() {
                     style={{ width: `${diagnosisResult.confidenceScore}%` }}
                   ></div>
                 </div>
-                <div className="text-[10px] text-gray-500 flex justify-between">
+
+                {/* Explicit Uncertainty Advisory */}
+                <div className="pt-1.5 border-t border-gray-200/80 text-[11px] text-gray-700 leading-relaxed">
+                  <span className="font-bold text-gray-900">Field Scout Advisory: </span>
+                  This score indicates visual pattern similarity with historical reference datasets. Under real field conditions, foliar symptoms can overlap between fungal pathogens, viral complexes, and soil deficiencies. <strong>Always confirm diagnoses with your Kebele Development Agent (DA) before purchasing chemical inputs.</strong>
+                </div>
+
+                <div className="text-[10px] text-gray-500 flex justify-between pt-0.5">
                   <span>Location: {selectedZone}, {selectedRegion}</span>
-                  <span>Model: EIAR/CABI v2.4</span>
+                  <span>Model: EIAR/CABI v2.4 (Pilot Advisory)</span>
                 </div>
               </div>
 

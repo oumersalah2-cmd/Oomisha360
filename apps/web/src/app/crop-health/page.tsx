@@ -96,13 +96,26 @@ export default function CropHealthPage() {
         </p>
       </div>
 
+      {/* Agricultural Safety & Non-Prescription Advisory Notice */}
+      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 sm:p-5 flex items-start gap-3.5 shadow-xs">
+        <AlertCircle className="h-5 w-5 text-amber-700 shrink-0 mt-0.5" />
+        <div className="space-y-1 text-xs text-amber-950">
+          <span className="font-bold text-amber-900 block text-sm">
+            Official Phytosanitary Safety & Diagnostic Notice
+          </span>
+          <p className="leading-relaxed text-amber-900/90">
+            AI pest and disease diagnoses are provisional preliminary observations calibrated for field scouting. <strong>They do NOT constitute chemical prescriptions.</strong> Never apply synthetic fungicides or insecticides without verifying economic damage thresholds with your local Kebele Agricultural Development Agent (DA). Always prioritize cultural sanitation and disease-resistant crop varieties.
+          </p>
+        </div>
+      </div>
+
       {/* Honest Architectural Status Banner */}
       <div className="bg-[#1B4332] text-white rounded-3xl p-6 sm:p-8 shadow-md relative overflow-hidden">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/10 text-emerald-300 text-[10px] font-bold">
               <Info className="h-3.5 w-3.5" />
-              <span>Low-Bandwidth Mobile Integration</span>
+              <span>Pilot Advisory Assistant</span>
             </div>
             <h3 className="text-xl font-bold text-white">
               Instant AI Vision Diagnosis via Telegram Bot (@gebere_vision_bot)
