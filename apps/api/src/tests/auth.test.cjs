@@ -199,5 +199,15 @@ describe('Gebere Vision AI / Oomisha360 - Authentication & Security Test Suite',
       assert.equal(verifyRes.status, 200);
       assert.equal(verifyRes.body.data.userId, 'real-claimant');
     });
+
+    it('POST /api/v1/auth/claim-demo-data blocks attempts to steal records from non-demo users (403 Forbidden)', async () => {
+      const maliciousRes = await request(app)
+        .post('/api/v1/auth/claim-demo-data')
+        .set('Authorization', 'Bearer demo-user-attacker')
+        .send({ demoUserId: 'victim-user-alice' });
+
+      assert.equal(maliciousRes.status, 403);
+      assert.equal(maliciousRes.body.error.code, 'FORBIDDEN');
+    });
   });
 });

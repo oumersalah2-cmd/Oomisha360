@@ -38,6 +38,7 @@ export default function FarmExpensesPage() {
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -55,7 +56,8 @@ export default function FarmExpensesPage() {
     e.preventDefault();
     const numAmount = parseFloat(amount);
     if (!farmId || !description || isNaN(numAmount) || numAmount <= 0) {
-      setStatusMsg("Please fill all fields with valid positive amounts.");
+      setErrorMsg("Please fill all fields with valid positive amounts.");
+      setStatusMsg(null);
       return;
     }
 
@@ -74,10 +76,12 @@ export default function FarmExpensesPage() {
       setDescription("");
       setAmount("");
       setIsAdding(false);
+      setErrorMsg(null);
       setStatusMsg("Expense logged successfully!");
       setTimeout(() => setStatusMsg(null), 3000);
     } catch (err: any) {
-      setStatusMsg(err.message || "Failed to save expense.");
+      setErrorMsg(err.message || "Failed to save expense.");
+      setStatusMsg(null);
     }
   };
 
@@ -114,9 +118,16 @@ export default function FarmExpensesPage() {
       </div>
 
       {statusMsg && (
-        <div className="bg-emerald-50 border border-emerald-200 text-[#1B4332] text-xs font-semibold p-3.5 rounded-xl flex items-center gap-2">
+        <div className="bg-emerald-50 border border-emerald-200 text-[#1B4332] text-xs font-semibold p-3.5 rounded-xl flex items-center gap-2 animate-fade-in">
           <CheckCircle2 className="h-4 w-4 text-[#2D6A4F]" />
           <span>{statusMsg}</span>
+        </div>
+      )}
+
+      {errorMsg && (
+        <div className="bg-red-50 border border-red-200 text-red-800 text-xs font-semibold p-3.5 rounded-xl flex items-center gap-2 animate-fade-in">
+          <AlertCircle className="h-4 w-4 text-red-600" />
+          <span>{errorMsg}</span>
         </div>
       )}
 

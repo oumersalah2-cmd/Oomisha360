@@ -26,12 +26,12 @@ export default function AnalyticsDashboard() {
   const crops = ["Coffee", "Wheat", "Maize", "Teff"];
   const maxCount = Math.max(...crops.map(c => cropCounts[c] || 0), 1);
 
-  // Mock commodity prices history for Sparklines
+  // Benchmark commodity prices for the 4 priority Ethiopian crops (ETB / kg)
   const commodityPrices = [
-    { name: "Specialty Coffee (Yirgacheffe)", price: "$6.20 / kg", trend: "+4.2%", type: "up", history: [40, 45, 42, 48, 55, 62] },
-    { name: "Durum Wheat", price: "85 ETB / kg", trend: "-1.5%", type: "down", history: [90, 88, 87, 89, 86, 85] },
-    { name: "White Teff (Magna)", price: "110 ETB / kg", trend: "+6.8%", type: "up", history: [95, 98, 100, 104, 107, 110] },
-    { name: "Red Sorghum", price: "60 ETB / kg", trend: "0.0%", type: "neutral", history: [60, 60, 60, 60, 60, 60] }
+    { name: "Specialty Coffee (Buna)", price: "110 ETB / kg", trend: "+4.2%", type: "up", history: [95, 98, 102, 105, 108, 110] },
+    { name: "Durum Wheat (Qamadii)", price: "85 ETB / kg", trend: "+1.5%", type: "up", history: [78, 80, 82, 81, 83, 85] },
+    { name: "White Teff (Xaafii Magna)", price: "110 ETB / kg", trend: "+6.8%", type: "up", history: [95, 98, 100, 104, 107, 110] },
+    { name: "Highland Barley (Garbuu)", price: "68 ETB / kg", trend: "+2.0%", type: "up", history: [62, 64, 65, 65, 67, 68] }
   ];
 
   return (
@@ -48,26 +48,28 @@ export default function AnalyticsDashboard() {
           </div>
           <div className="mt-4 flex items-baseline gap-2">
             <span className="text-3xl font-black text-white tracking-tight">
-              {5120 + diagnoses.length}
+              {diagnoses.length}
             </span>
-            <span className="text-[10px] text-emerald-green font-bold">+12% this wk</span>
+            <span className="text-[10px] text-emerald-green font-bold">Logged scans</span>
           </div>
-          <p className="text-[10px] text-zinc-500 mt-1">Real-time vector grounded queries via Telegram.</p>
+          <p className="text-[10px] text-zinc-500 mt-1">Recorded field pathology records from farmers.</p>
         </div>
 
         <div className="bg-charcoal border border-zinc-800/80 p-5 rounded-2xl relative overflow-hidden group hover:border-emerald-green/20 transition-all duration-300">
           <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-emerald-green/10 to-transparent rounded-bl-full pointer-events-none" />
           <div className="flex items-center justify-between">
             <span className="text-[10px] text-zinc-550 font-bold uppercase tracking-wider block">
-              Active Farmers
+              Active Lots Listed
             </span>
             <Users className="h-4 w-4 text-emerald-green" />
           </div>
           <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-3xl font-black text-white tracking-tight">2,482</span>
-            <span className="text-[10px] text-emerald-green font-bold">+8.4% growth</span>
+            <span className="text-3xl font-black text-white tracking-tight">
+              {listings.length}
+            </span>
+            <span className="text-[10px] text-emerald-green font-bold">Verified offerings</span>
           </div>
-          <p className="text-[10px] text-zinc-500 mt-1">Registered smallholders and union co-op leaders.</p>
+          <p className="text-[10px] text-zinc-500 mt-1">Directly listed from cooperatives and farms.</p>
         </div>
 
         <div className="bg-charcoal border border-zinc-800/80 p-5 rounded-2xl relative overflow-hidden group hover:border-emerald-green/20 transition-all duration-300">

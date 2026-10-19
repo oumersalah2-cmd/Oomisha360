@@ -251,15 +251,7 @@ export const apiClient = {
       body: JSON.stringify(farm),
     });
     if (res.success && res.data) return res.data;
-    const localFarm: Farm = {
-      ...farm,
-      id: `farm-${Date.now()}`,
-      userId: 'usr-demo-farmer-1',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    fallbackFarms.push(localFarm);
-    return localFarm;
+    throw new Error(res.error?.message || 'Failed to save farm to cloud database.');
   },
 
   async deleteFarm(farmId: string): Promise<boolean> {
@@ -309,7 +301,7 @@ export const apiClient = {
       body: JSON.stringify(record),
     });
     if (res.success && res.data) return res.data;
-    return null;
+    throw new Error(res.error?.message || 'Failed to save plot record to database.');
   },
 
   async updateLandRecord(id: string, updates: Partial<LandRecord>): Promise<LandRecord | null> {
@@ -318,7 +310,7 @@ export const apiClient = {
       body: JSON.stringify(updates),
     });
     if (res.success && res.data) return res.data;
-    return null;
+    throw new Error(res.error?.message || 'Failed to update plot record in database.');
   },
 
   async deleteLandRecord(id: string): Promise<boolean> {
@@ -348,15 +340,7 @@ export const apiClient = {
       body: JSON.stringify(expense),
     });
     if (res.success && res.data) return res.data;
-    const localExp: Expense = {
-      ...expense,
-      id: `exp-${Date.now()}`,
-      userId: 'usr-demo-farmer-1',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    fallbackExpenses.push(localExp);
-    return localExp;
+    throw new Error(res.error?.message || 'Failed to save expense record to database.');
   },
 
   async deleteExpense(id: string): Promise<boolean> {
@@ -386,15 +370,7 @@ export const apiClient = {
       body: JSON.stringify(harvest),
     });
     if (res.success && res.data) return res.data;
-    const localHrv: Harvest = {
-      ...harvest,
-      id: `hrv-${Date.now()}`,
-      userId: 'usr-demo-farmer-1',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    fallbackHarvests.push(localHrv);
-    return localHrv;
+    throw new Error(res.error?.message || 'Failed to save harvest record to database.');
   },
 
   async deleteHarvest(id: string): Promise<boolean> {

@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { requireAuth, isSupabaseAuthConfigured } from '../../middleware/auth';
 import { config } from '../../config';
 import { prisma, isUsingPrisma, inMemoryStore, ensureUserProfile } from '../../lib/db';
-import { BadRequestError } from '../../middleware/errorHandler';
+import { BadRequestError, ForbiddenError } from '../../middleware/errorHandler';
 
 export const authRouter = Router();
 
@@ -27,6 +27,20 @@ authRouter.post('/claim-demo-data', requireAuth, async (req: Request, res: Respo
 
     if (!demoUserId || typeof demoUserId !== 'string') {
       throw new BadRequestError('demoUserId string is required to transfer records.');
+    }
+
+    if (config.isProduction) {
+      throw new ForbiddenError('Demo data transfer is strictly prohibited in production mode.');
+    }
+
+    // Strict security enforcement: Only allow claiming from authorized demo identifiers
+    const isAuthorizedDemoUser =
+      demoUserId.startsWith('demo-') ||
+      demoUserId.startsWith('usr-demo-') ||
+      demoUserId === 'usr-demo-farmer-1';
+
+    if (!isAuthorizedDemoUser) {
+      throw new ForbiddenError('Security violation: Only verified demo accounts can be claimed into real accounts.');
     }
 
     if (demoUserId === realUserId) {

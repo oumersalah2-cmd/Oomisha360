@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -8,10 +8,7 @@ import {
   X,
   Sprout,
   Send,
-  Calculator,
   LayoutDashboard,
-  Coins,
-  TrendingUp,
   ShoppingBag,
   HeartPulse,
   User,
@@ -22,13 +19,13 @@ import {
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
-  const [isDemo, setIsDemo] = useState(true);
+  const [isDemo] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("gebere_demo_mode") !== "false";
+    }
+    return true;
+  });
   const pathname = usePathname();
-
-  useEffect(() => {
-    const demo = localStorage.getItem("gebere_demo_mode") !== "false";
-    setIsDemo(demo);
-  }, []);
 
   const navLinks = [
     { name: "Home", href: "/" },

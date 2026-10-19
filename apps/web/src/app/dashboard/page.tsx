@@ -81,20 +81,24 @@ export default function DashboardPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-[#E5DFD3] p-5">
           <span className="text-xs font-semibold text-gray-500 block">Seasonal Expenses</span>
           <div className="text-2xl font-extrabold text-red-600 mt-1">
-            ETB {finance ? finance.totalCost.toLocaleString() : "12,400"}
+            ETB {finance ? finance.totalCost.toLocaleString() : "0"}
           </div>
           <span className="text-[10px] text-gray-400 mt-1 block">
-            Meher 2023 inputs
+            {finance && finance.categoryBreakdown.length > 0
+              ? `${finance.categoryBreakdown.length} logged expense categories`
+              : "Total recorded input costs"}
           </span>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-[#E5DFD3] p-5">
           <span className="text-xs font-semibold text-gray-500 block">Expected Revenue</span>
           <div className="text-2xl font-extrabold text-[#2D6A4F] mt-1">
-            ETB {finance ? finance.totalRevenue.toLocaleString() : "38,000"}
+            ETB {finance ? finance.totalRevenue.toLocaleString() : "0"}
           </div>
           <span className="text-[10px] text-gray-400 mt-1 block">
-            At current market prices
+            {finance
+              ? `Estimated Net: ETB ${finance.estimatedProfit.toLocaleString()}`
+              : "Aggregated harvest revenues"}
           </span>
         </div>
 

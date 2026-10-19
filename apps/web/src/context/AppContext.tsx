@@ -116,11 +116,41 @@ const initialDiagnoses: DiagnosticHistoryItem[] = [
 ];
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>("om");
+  const [language, setLanguageState] = useState<Language>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const storedLang = localStorage.getItem("gebere_lang") as Language;
+        if (storedLang && (storedLang === "en" || storedLang === "om" || storedLang === "am")) {
+          return storedLang;
+        }
+      } catch {}
+    }
+    return "om";
+  });
   const [listings, setListings] = useState<MarketplaceListing[]>(initialListings);
   const [diagnoses, setDiagnoses] = useState<DiagnosticHistoryItem[]>(initialDiagnoses);
 
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("gebere_notifications");
+        if (stored) {
+          return JSON.parse(stored);
+        }
+      } catch {}
+    }
+    return [
+      {
+        id: "notif-welcome",
+        title: "Welcome to Oomisha360",
+        message: "Supabase Authentication & Gebere Vision AI services are active.",
+        timestamp: new Date().toISOString(),
+        type: "system",
+        read: false,
+        link: "/gebere-vision-ai"
+      }
+    ];
+  });
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
@@ -129,15 +159,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   };
 
-  // Load listings, diagnoses, notifications, and language
+  // Load listings and diagnoses
   useEffect(() => {
-    try {
-      const storedLang = localStorage.getItem("gebere_lang") as Language;
-      if (storedLang && (storedLang === "en" || storedLang === "om" || storedLang === "am")) {
-        setLanguageState(storedLang);
-      }
-    } catch {}
-
     async function loadData() {
       const dbListings = await getListingsAction();
       const dbDiagnoses = await getDiagnosesAction();
@@ -150,27 +173,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
     }
     loadData();
-
-    try {
-      const stored = localStorage.getItem("gebere_notifications");
-      if (stored) {
-        setNotifications(JSON.parse(stored));
-      } else {
-        const initialNotes: NotificationItem[] = [
-          {
-            id: "notif-welcome",
-            title: "Welcome to Oomisha360",
-            message: "Supabase Authentication & Gebere Vision AI services are active.",
-            timestamp: new Date().toISOString(),
-            type: "system",
-            read: false,
-            link: "/gebere-vision-ai"
-          }
-        ];
-        setNotifications(initialNotes);
-        localStorage.setItem("gebere_notifications", JSON.stringify(initialNotes));
-      }
-    } catch {}
   }, []);
 
   const unreadNotificationsCount = notifications.filter((n) => !n.read).length;

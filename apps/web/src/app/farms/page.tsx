@@ -15,7 +15,8 @@ import {
   Trash2,
   Edit2,
   ExternalLink,
-  X
+  X,
+  AlertCircle
 } from "lucide-react";
 import { Farm, ZoneItem, EthiopiaRegionSummary, LandRecord } from "@gebere/shared";
 import { apiClient } from "@/lib/api-client";
@@ -49,6 +50,7 @@ export default function MyFarmPage() {
   const [loadingPlots, setLoadingPlots] = useState(true);
   const [loading, setLoading] = useState(false);
   const [successNotice, setSuccessNotice] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Edit plot modal state
   const [editingPlot, setEditingPlot] = useState<LandRecord | null>(null);
@@ -114,6 +116,7 @@ export default function MyFarmPage() {
   const handleStartFarm = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setSaveError(null);
 
     try {
       const selectedCropNames = Object.entries(crops)
@@ -135,8 +138,9 @@ export default function MyFarmPage() {
       setSavedFarms((prev) => [newFarm, ...prev]);
       setSuccessNotice(true);
       setTimeout(() => setSuccessNotice(false), 3000);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to save farm", err);
+      setSaveError(err.message || "Failed to save farm to database. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -210,6 +214,13 @@ export default function MyFarmPage() {
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-100 text-[#1B4332] text-xs font-semibold animate-fade-in">
             <CheckCircle2 className="h-4 w-4 text-[#2D6A4F]" />
             <span>Farm Profile Saved Successfully!</span>
+          </div>
+        )}
+
+        {saveError && (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-100 text-red-800 text-xs font-semibold animate-fade-in">
+            <AlertCircle className="h-4 w-4 text-red-600" />
+            <span>{saveError}</span>
           </div>
         )}
       </div>

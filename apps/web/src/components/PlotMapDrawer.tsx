@@ -22,6 +22,46 @@ export default function PlotMapDrawer({ onAreaCalculated }: PlotMapDrawerProps) 
   const [calculation, setCalculation] = useState<LandAreaResult | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const updatePolygonLayer = async (pts: PolygonCoordinates[], LInstance?: any, mapInst?: any) => {
+    const L = LInstance || (await import("leaflet")).default;
+    const map = mapInst || mapInstanceRef.current;
+    if (!map) return;
+
+    // Clear previous markers
+    markersRef.current.forEach((m) => map.removeLayer(m));
+    markersRef.current = [];
+
+    // Add marker for each vertex
+    pts.forEach((pt, index) => {
+      const marker = L.circleMarker([pt.lat, pt.lng], {
+        radius: 6,
+        color: "#10b981",
+        fillColor: "#065f46",
+        fillOpacity: 0.9,
+        weight: 2,
+      }).addTo(map);
+      marker.bindTooltip(`Point ${index + 1}`, { permanent: false });
+      markersRef.current.push(marker);
+    });
+
+    // Update polygon boundary
+    if (polygonLayerRef.current) {
+      map.removeLayer(polygonLayerRef.current);
+      polygonLayerRef.current = null;
+    }
+
+    if (pts.length >= 3) {
+      const latlngs = pts.map((p) => [p.lat, p.lng]);
+      polygonLayerRef.current = L.polygon(latlngs, {
+        color: "#10b981",
+        weight: 2.5,
+        fillColor: "#10b981",
+        fillOpacity: 0.25,
+      }).addTo(map);
+    }
+  };
+
   useEffect(() => {
     // Dynamic load leaflet in browser
     let isMounted = true;
@@ -67,47 +107,6 @@ export default function PlotMapDrawer({ onAreaCalculated }: PlotMapDrawerProps) 
       }
     };
   }, []);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const updatePolygonLayer = async (pts: PolygonCoordinates[], LInstance?: any, mapInst?: any) => {
-    const L = LInstance || (await import("leaflet")).default;
-    const map = mapInst || mapInstanceRef.current;
-    if (!map) return;
-
-    // Clear previous markers
-    markersRef.current.forEach((m) => map.removeLayer(m));
-    markersRef.current = [];
-
-    // Add marker for each vertex
-    pts.forEach((pt, index) => {
-      const marker = L.circleMarker([pt.lat, pt.lng], {
-        radius: 6,
-        color: "#10b981",
-        fillColor: "#065f46",
-        fillOpacity: 0.9,
-        weight: 2,
-      }).addTo(map);
-      marker.bindTooltip(`Point ${index + 1}`, { permanent: false });
-      markersRef.current.push(marker);
-    });
-
-    // Update polygon boundary
-    if (polygonLayerRef.current) {
-      map.removeLayer(polygonLayerRef.current);
-      polygonLayerRef.current = null;
-    }
-
-    if (pts.length >= 3) {
-      const latlngs = pts.map((p) => [p.lat, p.lng]);
-      polygonLayerRef.current = L.polygon(latlngs, {
-        color: "#10b981",
-        weight: 2.5,
-        fillColor: "#10b981",
-        fillOpacity: 0.25,
-      }).addTo(map);
-    }
-  };
-
   const handleClear = async () => {
     setPoints([]);
     setCalculation(null);
