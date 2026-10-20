@@ -116,41 +116,42 @@ const initialDiagnoses: DiagnosticHistoryItem[] = [
 ];
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const storedLang = localStorage.getItem("gebere_lang") as Language;
-        if (storedLang && (storedLang === "en" || storedLang === "om" || storedLang === "am")) {
-          return storedLang;
-        }
-      } catch {}
-    }
-    return "om";
-  });
+  // Deterministic initial state to ensure server and client match during hydration
+  const [language, setLanguageState] = useState<Language>("en");
   const [listings, setListings] = useState<MarketplaceListing[]>(initialListings);
   const [diagnoses, setDiagnoses] = useState<DiagnosticHistoryItem[]>(initialDiagnoses);
-
-  const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem("gebere_notifications");
-        if (stored) {
-          return JSON.parse(stored);
-        }
-      } catch {}
+  const [notifications, setNotifications] = useState<NotificationItem[]>([
+    {
+      id: "notif-welcome",
+      title: "Welcome to Oomisha360",
+      message: "Supabase Authentication & Gebere Vision AI services are active.",
+      timestamp: "2026-10-20T10:00:00.000Z",
+      type: "system",
+      read: false,
+      link: "/gebere-vision-ai"
     }
-    return [
-      {
-        id: "notif-welcome",
-        title: "Welcome to Oomisha360",
-        message: "Supabase Authentication & Gebere Vision AI services are active.",
-        timestamp: new Date().toISOString(),
-        type: "system",
-        read: false,
-        link: "/gebere-vision-ai"
+  ]);
+
+  // Synchronize stored preferences strictly after hydration on the client
+  useEffect(() => {
+    try {
+      const storedLang = localStorage.getItem("gebere_lang") as Language;
+      if (storedLang && (storedLang === "en" || storedLang === "om" || storedLang === "am")) {
+        setLanguageState(storedLang);
       }
-    ];
-  });
+      const storedNotes = localStorage.getItem("gebere_notifications");
+      if (storedNotes) {
+        setNotifications(JSON.parse(storedNotes));
+      }
+    } catch {}
+  }, []);
+
+  // Sync document html lang attribute with current language selection
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = language;
+    }
+  }, [language]);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);

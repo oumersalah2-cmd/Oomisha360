@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -19,12 +19,17 @@ import {
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
-  const [isDemo] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("gebere_demo_mode") !== "false";
-    }
-    return true;
-  });
+  const [isDemo, setIsDemo] = useState(true);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("gebere_demo_mode");
+      if (stored !== null) {
+        setIsDemo(stored !== "false");
+      }
+    } catch {}
+  }, []);
+
   const pathname = usePathname();
 
   const navLinks = [
