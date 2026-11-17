@@ -49,8 +49,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedCrop, setSelectedCrop] = useState("Teff");
-  const [selectedFarm, setSelectedFarm] = useState("Farm Alpha");
-  const [selectedSeason, setSelectedSeason] = useState("Meher 2024");
+  const [selectedFarm, setSelectedFarm] = useState("");
+  const [selectedSeason, setSelectedSeason] = useState("");
   
   // Real Dynamic User & Notification Dropdown State
   const [showNotifications, setShowNotifications] = useState(false);

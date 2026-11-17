@@ -1,24 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { ChevronDown, Globe, AlertCircle, Info } from "lucide-react";
 import { setAuthToken, setDemoMode } from "@/lib/api-client";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [identifier, setIdentifier] = useState("farmer@oomisha360.et");
-  const [password, setPassword] = useState("password123");
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
   const [isTopLangOpen, setIsTopLangOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [hasSupabaseKeys, setHasSupabaseKeys] = useState(false);
-
-  useEffect(() => {
-    setHasSupabaseKeys(isSupabaseConfigured());
-  }, []);
+  const hasSupabaseKeys = isSupabaseConfigured();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,8 +44,8 @@ export default function LoginPage() {
           router.push("/farms");
           return;
         }
-      } catch (err: any) {
-        setErrorMsg(err.message || "Failed to authenticate with Supabase Auth.");
+      } catch (err: unknown) {
+        setErrorMsg(err instanceof Error ? err.message : "Failed to authenticate with Supabase Auth.");
         setLoading(false);
         return;
       }
@@ -59,12 +56,6 @@ export default function LoginPage() {
       );
       setLoading(false);
     }
-  };
-
-  const handleDemoSignIn = () => {
-    setAuthToken("demo-user-farmer-1");
-    setDemoMode(true);
-    router.push("/farms");
   };
 
   return (
@@ -116,9 +107,11 @@ export default function LoginPage() {
 
           {/* Farmer Terraced Fields Illustration */}
           <div className="rounded-2xl overflow-hidden shadow-lg border border-white/10 bg-emerald-950/40">
-            <img
-              src="/images/ethiopian_farmer_terrace.jpg"
+            <Image
+              src="/images/grains-collage.png"
               alt="Ethiopian farmer cultivating terraced crop fields"
+              width={735}
+              height={1103}
               className="w-full h-52 sm:h-64 object-cover object-center"
             />
           </div>
@@ -146,7 +139,7 @@ export default function LoginPage() {
             ) : (
               <div className="bg-amber-50 border border-amber-200 text-amber-800 px-3 py-1.5 rounded-xl text-[11px] flex items-center gap-1.5">
                 <Info className="h-3.5 w-3.5 text-amber-600 shrink-0" />
-                <span>Development demo mode (Supabase keys pending)</span>
+                <span>Connect Supabase to sign in securely</span>
               </div>
             )}
 
@@ -192,19 +185,11 @@ export default function LoginPage() {
               </button>
             </div>
 
-            {/* Fast Demo Mode Button */}
-            <button
-              type="button"
-              onClick={handleDemoSignIn}
-              className="w-full bg-[#F5F0E8] hover:bg-[#EAE4D9] text-[#1B4332] font-semibold py-2.5 rounded-xl text-xs transition-all border border-[#D8D2C4]"
-            >
-              Quick Demo Sign-In (Pre-loaded Farmer Profile)
-            </button>
           </form>
 
           {/* Footer Link */}
           <div className="text-center mt-6 text-sm text-gray-600">
-            <span>Don't have an account? </span>
+            <span>Don&apos;t have an account? </span>
             <Link
               href="/auth/register"
               className="text-[#2D6A4F] font-semibold hover:underline"

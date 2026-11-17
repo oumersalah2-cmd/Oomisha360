@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronDown, Globe, AlertCircle, CheckCircle2, Info } from "lucide-react";
+import Image from "next/image";
+import { ChevronDown, Globe, AlertCircle, CheckCircle2, Info, Wheat } from "lucide-react";
 import { ZoneItem } from "@gebere/shared";
 import { setAuthToken, setDemoMode, apiClient } from "@/lib/api-client";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
@@ -14,18 +15,14 @@ export default function RegisterPage() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [zones, setZones] = useState<ZoneItem[]>([]);
-  const [farmLocation, setFarmLocation] = useState("Bale");
-  const [language, setLanguage] = useState("Afaan Oromoo");
+  const [farmLocation, setFarmLocation] = useState("");
+  const [language, setLanguage] = useState("");
   const [topLanguage, setTopLanguage] = useState("English");
   const [isTopLangOpen, setIsTopLangOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
-  const [hasSupabaseKeys, setHasSupabaseKeys] = useState(false);
-
-  useEffect(() => {
-    setHasSupabaseKeys(isSupabaseConfigured());
-  }, []);
+  const hasSupabaseKeys = isSupabaseConfigured();
 
   useEffect(() => {
     async function loadZones() {
@@ -35,7 +32,7 @@ export default function RegisterPage() {
           setZones(list);
         }
       } catch (err) {
-        console.error("Failed to load zones for registration", err);
+        setErrorMsg(err instanceof Error ? err.message : "Unable to load farm locations.");
       }
     }
     loadZones();
@@ -47,16 +44,26 @@ export default function RegisterPage() {
     setErrorMsg(null);
     setSuccessMsg(null);
 
-    const email = identifier.includes("@") ? identifier.trim() : `${identifier.trim()}@oomisha360.et`;
+    const email = identifier.trim().toLowerCase();
+    if (!fullName.trim() || !email.includes("@") || password.length < 8 || !farmLocation || !language) {
+      setErrorMsg("Enter your full name, a valid email, a farm location, a language, and a password of at least 8 characters.");
+      setLoading(false);
+      return;
+    }
 
-    if (isSupabaseConfigured()) {
-      try {
+    if (!hasSupabaseKeys) {
+      setErrorMsg("Sign-up is unavailable until Supabase authentication is configured.");
+      setLoading(false);
+      return;
+    }
+
+    try {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             data: {
-              fullName: fullName.trim() || "Farmer Member",
+              fullName: fullName.trim(),
               zone: farmLocation,
               language,
               role: "farmer",
@@ -74,11 +81,8 @@ export default function RegisterPage() {
           setAuthToken(data.session.access_token);
           setDemoMode(false);
 
-          const matched = zones.find((z) => z.name === farmLocation);
           await apiClient.updateProfile({
-            fullName: fullName || "Farmer Abebe",
-            phone: identifier.includes("@") ? undefined : identifier,
-            region: (matched as any)?.region || "Ethiopia",
+            fullName: fullName.trim(),
             zone: farmLocation,
           });
 
@@ -91,33 +95,10 @@ export default function RegisterPage() {
           setLoading(false);
           return;
         }
-      } catch (err: any) {
-        setErrorMsg(err.message || "Failed to create Supabase account.");
-        setLoading(false);
-        return;
-      }
-    } else {
-      // Development demo fallback
-      try {
-        setAuthToken("demo-user-farmer-1");
-        setDemoMode(true);
-
-        const matched = zones.find((z) => z.name === farmLocation);
-        await apiClient.updateProfile({
-          fullName: fullName || "Farmer Abebe",
-          phone: identifier.includes("@") ? undefined : identifier,
-          region: (matched as any)?.region || "Ethiopia",
-          zone: farmLocation,
-        });
-
-        router.push("/farms");
-      } catch (err) {
-        console.error("Registration failed", err);
-        router.push("/farms");
-      } finally {
+      } catch (err: unknown) {
+        setErrorMsg(err instanceof Error ? err.message : "Failed to create Supabase account.");
         setLoading(false);
       }
-    }
   };
 
   return (
@@ -160,9 +141,11 @@ export default function RegisterPage() {
 
           {/* Center Brand Title & Tagline */}
           <div className="my-8 text-center space-y-3">
-            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-white font-sans">
-              Oomisha360
-            </h1>
+            <div className="flex items-center justify-center gap-2 text-[#d9f99d]">
+              <Wheat className="h-6 w-6" />
+              <span className="text-xs font-bold uppercase tracking-[0.2em]">{topLanguage}</span>
+            </div>
+            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-white font-sans">Oomisha360</h1>
             <p className="text-sm sm:text-base text-emerald-100/90 leading-relaxed max-w-xs mx-auto">
               Know Your Farm. Control Your Costs.
               <br />
@@ -172,9 +155,11 @@ export default function RegisterPage() {
 
           {/* Farmer Terraced Fields Illustration */}
           <div className="rounded-2xl overflow-hidden shadow-lg border border-white/10 bg-emerald-950/40">
-            <img
+            <Image
               src="/images/ethiopian_farmer_terrace.jpg"
               alt="Ethiopian farmer cultivating terraced crop fields"
+              width={800}
+              height={500}
               className="w-full h-52 sm:h-64 object-cover object-center"
             />
           </div>
@@ -207,7 +192,7 @@ export default function RegisterPage() {
             ) : (
               <div className="bg-amber-50 border border-amber-200 text-amber-800 px-3 py-1.5 rounded-xl text-[11px] flex items-center gap-1.5">
                 <Info className="h-3.5 w-3.5 text-amber-600 shrink-0" />
-                <span>Development demo mode (Supabase keys pending)</span>
+                <span>Connect Supabase to create a secure account</span>
               </div>
             )}
 
@@ -229,12 +214,12 @@ export default function RegisterPage() {
                 type="text"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
-                placeholder="Phone Number (primary) or Email (optional)"
+                placeholder="Email address"
                 className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#2D6A4F] focus:ring-1 focus:ring-[#2D6A4F] transition-all"
                 required
               />
               <p className="text-xs text-gray-500 mt-1 pl-1">
-                No email required — phone number accepted.
+                Use an email address you can access to confirm your account.
               </p>
             </div>
 
@@ -259,19 +244,12 @@ export default function RegisterPage() {
                   onChange={(e) => setFarmLocation(e.target.value)}
                   className="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-800 appearance-none pr-10 focus:outline-none focus:border-[#2D6A4F] focus:ring-1 focus:ring-[#2D6A4F]"
                 >
-                  {zones.length > 0 ? (
-                    zones.map((z) => (
+                  <option value="" disabled>Select your farm zone</option>
+                  {zones.map((z) => (
                       <option key={z.id} value={z.name}>
                         {z.name}
                       </option>
-                    ))
-                  ) : (
-                    <>
-                      <option value="Bale">Bale</option>
-                      <option value="West Arsi">West Arsi</option>
-                      <option value="Other">Other</option>
-                    </>
-                  )}
+                  ))}
                 </select>
                 <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none" />
               </div>
@@ -286,6 +264,7 @@ export default function RegisterPage() {
                   onChange={(e) => setLanguage(e.target.value)}
                   className="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-800 appearance-none pr-10 focus:outline-none focus:border-[#2D6A4F] focus:ring-1 focus:ring-[#2D6A4F]"
                 >
+                  <option value="" disabled>Select a language</option>
                   <option value="Afaan Oromoo">Afaan Oromoo</option>
                   <option value="Amharic">Amharic</option>
                   <option value="English">English</option>

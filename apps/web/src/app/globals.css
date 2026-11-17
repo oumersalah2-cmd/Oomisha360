@@ -12,7 +12,7 @@
   --white: #FFFFFF;
   --dark-charcoal: #1A1A2E;
   
-  --background: var(--warm-cream);
+  --background: #f7faf4;
   --foreground: var(--dark-charcoal);
   --card: #FFFFFF;
   --card-foreground: var(--dark-charcoal);
@@ -45,11 +45,16 @@
 
 /* Base Body Styles */
 body {
-  background-color: var(--warm-cream);
+  background-color: var(--background);
   color: var(--dark-charcoal);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: #b7d98b;
+  color: #123b2b;
 }
 
 /* Custom Scrollbars */
@@ -178,4 +183,3 @@ body {
 .animate-laser-scan {
   animation: laserScan 2.2s ease-in-out infinite;
 }
-

@@ -1,236 +1,137 @@
 import Link from "next/link";
 import {
-  Calculator,
-  Home as HomeIcon,
-  Sprout,
-  LayoutDashboard,
-  Wallet,
-  ShoppingBag,
-  ArrowRight,
-  TrendingUp,
+  ArrowUpRight,
+  BarChart3,
+  Check,
+  ChevronRight,
+  Map,
+  ScanLine,
   ShieldCheck,
-  CheckCircle2,
-  Compass,
-  DollarSign,
-  Sparkles
+  Sprout,
+  Store,
+  Tractor,
 } from "lucide-react";
 
+const services = [
+  {
+    icon: ScanLine,
+    eyebrow: "01 / Intelligence",
+    title: "See problems earlier",
+    description:
+      "Turn a crop photo into a practical scouting brief with Gebere Vision AI, built for the realities of Ethiopian fields.",
+    href: "/gebere-vision-ai",
+  },
+  {
+    icon: Map,
+    eyebrow: "02 / Field operations",
+    title: "Know every plot",
+    description:
+      "Map land, register farms, and keep crop activity in one dependable workspace your team can use every season.",
+    href: "/farms",
+  },
+  {
+    icon: BarChart3,
+    eyebrow: "03 / Farm economics",
+    title: "Grow with clarity",
+    description:
+      "Track expenses, harvests, and margins in ETB so each decision is grounded in your own numbers.",
+    href: "/finance",
+  },
+  {
+    icon: Store,
+    eyebrow: "04 / Market access",
+    title: "Move harvest forward",
+    description:
+      "Connect quality produce with buyers and cooperative partners through a focused B2B marketplace.",
+    href: "/marketplace",
+  },
+];
+
 export default function Home() {
-  const modules = [
-    {
-      title: "Gebere Vision AI",
-      subtitle: "Computer-Vision Crop Disease Diagnostics",
-      desc: "Specialized agricultural AI assistant detecting Coffee Leaf Rust, Wheat Stem Rust, Teff Rust, and Barley Net Blotch with EIAR & CABI validated management.",
-      href: "/gebere-vision-ai",
-      icon: Sparkles,
-      tag: "Neural AI Assistant",
-      badgeBg: "bg-emerald-100 text-[#1B4332]",
-    },
-    {
-      title: "Land Calculator",
-      subtitle: "3977.06 m² • 0.024 Ha • 0.677 Acres",
-      desc: "Dual-panel rectangular dimensional calculations and interactive OpenStreetMap GPS polygon field measurement.",
-      href: "/land-calculator",
-      icon: Calculator,
-      tag: "Precision Geometry",
-      badgeBg: "bg-emerald-50 text-[#2D6A4F]",
-    },
-    {
-      title: "My Farm",
-      subtitle: "All-Ethiopia Telemetry & Field Mapping",
-      desc: "Plot registry with coffee, teff, wheat, and barley crop selections across all 14 Ethiopian regions, weather telemetry, and live activity tracking.",
-      href: "/farms",
-      icon: HomeIcon,
-      tag: "Field Management",
-      badgeBg: "bg-amber-50 text-[#8B5E3C]",
-    },
-    {
-      title: "Crops Intelligence",
-      subtitle: "Buna, Xaafii, Qamadii, Garbuu",
-      desc: "Agronomic profiles, phenological stage trackers, elevation requirements, and real-time market price indicators.",
-      href: "/crops",
-      icon: Sprout,
-      tag: "Crop Pathology & Yield",
-      badgeBg: "bg-emerald-50 text-[#2D6A4F]",
-    },
-    {
-      title: "Finance Dashboard",
-      subtitle: "ETB 12,400 Cost • ETB 38,000 Revenue",
-      desc: "Decimal-safe ETB input tracking across 9 categories, dual donut breakdown charts, and smooth area revenue trends.",
-      href: "/finance",
-      icon: LayoutDashboard,
-      tag: "Monetary Economics",
-      badgeBg: "bg-teal-50 text-teal-800",
-    },
-  ];
-
   return (
-    <div className="max-w-6xl mx-auto space-y-12 py-4">
-      
-      {/* Hero Banner matching Image 1 & 4 brand */}
-      <section className="bg-[#1B4332] text-white rounded-3xl p-8 sm:p-12 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
-        
-        {/* Left Hero Content */}
-        <div className="max-w-xl space-y-4 z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-emerald-300 text-xs font-semibold">
-            <Sprout className="h-4 w-4" />
-            <span>Oomisha360 Precision AgTech</span>
-          </div>
-
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-            Know Your Farm.
-            <br />
-            Control Your Costs.
-            <br />
-            <span className="text-emerald-300">Grow Your Profits.</span>
-          </h1>
-
-          <p className="text-sm sm:text-base text-emerald-100/80 leading-relaxed">
-            The unified agricultural operating platform for Ethiopian farmers, cooperative unions, and agronomists.
-          </p>
-
-          <div className="flex flex-wrap items-center gap-3 pt-2">
-            <Link
-              href="/auth/register"
-              className="bg-[#40916C] hover:bg-[#2D6A4F] text-white font-semibold px-6 py-3 rounded-xl text-sm transition-all shadow-lg shadow-black/20 flex items-center gap-2"
-            >
-              <span>Create Free Account</span>
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-
-            <Link
-              href="/land-calculator"
-              className="border border-white/20 hover:bg-white/10 text-white font-medium px-5 py-3 rounded-xl text-sm transition-colors"
-            >
-              Test Land Calculator
-            </Link>
-          </div>
-        </div>
-
-        {/* Right Illustration Thumbnail */}
-        <div className="w-full md:w-80 h-64 rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex-shrink-0 bg-emerald-950/60">
-          <img
-            src="/images/ethiopian_farmer_terrace.jpg"
-            alt="Ethiopian farmer cultivating crops"
-            className="w-full h-full object-cover"
-          />
-        </div>
-      </section>
-
-      {/* 4 Core Design System Modules */}
-      <section className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-[#1A1A2E] tracking-tight">
-              Platform Modules
-            </h2>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Designed according to the Oomisha360 design reference specification.
+    <main className="space-y-24 pb-10">
+      <section className="relative overflow-hidden rounded-[2rem] bg-[#123b2b] text-white shadow-[0_24px_70px_rgba(18,59,43,0.2)]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(176,216,105,0.22),transparent_34%),linear-gradient(115deg,rgba(18,59,43,0.98)_0%,rgba(18,59,43,0.86)_45%,rgba(18,59,43,0.3)_100%)]" />
+        <div className="relative grid min-h-[620px] items-end gap-12 p-7 sm:p-12 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:p-16">
+          <div className="max-w-2xl">
+            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#d9f99d] backdrop-blur-sm">
+              <Sprout className="h-4 w-4" />
+              Built for Ethiopia&apos;s growers
+            </div>
+            <h1 className="max-w-xl text-5xl font-semibold leading-[0.98] tracking-[-0.06em] sm:text-7xl">
+              Better farming starts with a clearer view.
+            </h1>
+            <p className="mt-7 max-w-lg text-base leading-7 text-[#d6e7dc] sm:text-lg">
+              Oomisha360 brings farm intelligence, field operations, crop health, and market access into one calm, practical workspace.
             </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {modules.map((m) => {
-            const Icon = m.icon;
-            return (
-              <Link
-                key={m.href}
-                href={m.href}
-                className="bg-white rounded-2xl p-6 sm:p-7 border border-[#E5DFD3] shadow-sm hover:shadow-md transition-all group flex flex-col justify-between"
-              >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="h-12 w-12 rounded-xl bg-[#F5F0E8] text-[#1B4332] flex items-center justify-center group-hover:bg-[#2D6A4F] group-hover:text-white transition-colors">
-                      <Icon className="h-6 w-6" />
-                    </div>
-                    <span className={`text-[11px] font-bold px-3 py-1 rounded-full ${m.badgeBg}`}>
-                      {m.tag}
-                    </span>
-                  </div>
-
-                  <div>
-                    <h3 className="text-xl font-bold text-[#1A1A2E] group-hover:text-[#2D6A4F] transition-colors">
-                      {m.title}
-                    </h3>
-                    <div className="text-xs font-semibold text-[#8B5E3C] mt-0.5">
-                      {m.subtitle}
-                    </div>
-                    <p className="text-xs text-gray-600 mt-2 leading-relaxed">
-                      {m.desc}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-[#2D6A4F]">
-                  <span>Launch Module</span>
-                  <ArrowRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
-                </div>
+            <div className="mt-9 flex flex-wrap gap-3">
+              <Link href="/auth/register" className="group inline-flex items-center gap-3 rounded-full bg-[#d9f99d] px-6 py-3.5 text-sm font-bold text-[#123b2b] transition-transform hover:-translate-y-0.5">
+                Start your farm workspace
+                <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </Link>
-            );
-          })}
+              <Link href="/features" className="inline-flex items-center gap-2 rounded-full border border-white/25 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-white/10">
+                Explore the platform
+              </Link>
+            </div>
+            <div className="mt-12 flex flex-wrap gap-x-7 gap-y-3 text-xs text-[#b8d2c2]">
+              {["Simple by design", "Data you control", "Made for field teams"].map((item) => (
+                <span key={item} className="inline-flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-[#d9f99d]" />
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="relative mx-auto w-full max-w-[500px] lg:ml-auto">
+            <div className="absolute -inset-5 rounded-[2rem] border border-white/15" />
+            <div className="relative overflow-hidden rounded-[1.5rem] border-8 border-white/90 bg-white shadow-2xl">
+              <img src="/images/agriculture-collage.png" alt="A collage of Ethiopian crops, farmers, irrigation, and harvest" className="aspect-square w-full object-cover" />
+            </div>
+            <div className="absolute -bottom-5 -left-5 rounded-2xl bg-white p-4 text-[#123b2b] shadow-xl sm:-left-10">
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl bg-[#e8f4d0] p-2.5"><Tractor className="h-5 w-5" /></div>
+                <div><p className="text-[10px] font-bold uppercase tracking-wider text-[#69806f]">One connected view</p><p className="mt-0.5 text-sm font-bold">From soil to sale</p></div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Quick Access to Crop Catalog from Image 3 */}
-      <section className="bg-white rounded-3xl p-6 sm:p-8 border border-[#E5DFD3] shadow-sm space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h3 className="text-xl font-bold text-[#1A1A2E]">
-              Featured Ethiopian Crops
-            </h3>
-            <p className="text-xs text-gray-500">
-              High-yield varieties, market prices, and phenological stage trackers.
-            </p>
-          </div>
-          <Link
-            href="/crops"
-            className="text-xs font-bold text-[#2D6A4F] hover:underline flex items-center gap-1"
-          >
-            <span>View All Crop Profiles</span>
-            <ArrowRight className="h-3.5 w-3.5" />
+      <section className="grid gap-8 lg:grid-cols-[.8fr_1.2fr] lg:items-end">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#7b927e]">The Oomisha360 approach</p>
+          <h2 className="mt-4 max-w-md text-4xl font-semibold leading-tight tracking-[-0.04em] text-[#123b2b] sm:text-5xl">
+            Less guesswork. More progress.
+          </h2>
+        </div>
+        <p className="max-w-xl text-base leading-7 text-[#64736a] lg:ml-auto">
+          Your farm is a living system. We designed the platform to keep the important signals together, so farmers, cooperatives, and agronomists can act with confidence.
+        </p>
+      </section>
+
+      <section className="grid gap-4 sm:grid-cols-2">
+        {services.map(({ icon: Icon, ...service }) => (
+          <Link key={service.href} href={service.href} className="group rounded-[1.5rem] border border-[#dfe8df] bg-white p-7 transition-all hover:-translate-y-1 hover:border-[#9bbf8d] hover:shadow-[0_18px_40px_rgba(18,59,43,0.08)]">
+            <div className="flex items-start justify-between">
+              <div className="rounded-2xl bg-[#edf6e3] p-3.5 text-[#286344]"><Icon className="h-6 w-6" /></div>
+              <ArrowUpRight className="h-5 w-5 text-[#9caf9f] transition-colors group-hover:text-[#286344]" />
+            </div>
+            <p className="mt-8 text-[10px] font-bold uppercase tracking-[0.18em] text-[#8a9d8c]">{service.eyebrow}</p>
+            <h3 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[#123b2b]">{service.title}</h3>
+            <p className="mt-3 max-w-md text-sm leading-6 text-[#68776d]">{service.description}</p>
+            <span className="mt-6 inline-flex items-center gap-1 text-xs font-bold text-[#286344]">Open workspace <ChevronRight className="h-3.5 w-3.5" /></span>
           </Link>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="rounded-2xl overflow-hidden border border-gray-200 relative group">
-            <img src="/images/crops/coffee.jpg" alt="Coffee" className="w-full h-32 object-cover group-hover:scale-105 transition-transform" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
-            <div className="absolute bottom-2 left-3 right-3 text-white">
-              <span className="text-xs font-bold block">Coffee / Buna</span>
-              <span className="text-[10px] text-emerald-200">110 ETB/kg</span>
-            </div>
-          </div>
-
-          <div className="rounded-2xl overflow-hidden border border-gray-200 relative group">
-            <img src="/images/crops/teff.jpg" alt="Teff" className="w-full h-32 object-cover group-hover:scale-105 transition-transform" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
-            <div className="absolute bottom-2 left-3 right-3 text-white">
-              <span className="text-xs font-bold block">Teff / Xaafii</span>
-              <span className="text-[10px] text-emerald-200">Magna White</span>
-            </div>
-          </div>
-
-          <div className="rounded-2xl overflow-hidden border border-gray-200 relative group">
-            <img src="/images/crops/wheat.jpg" alt="Wheat" className="w-full h-32 object-cover group-hover:scale-105 transition-transform" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
-            <div className="absolute bottom-2 left-3 right-3 text-white">
-              <span className="text-xs font-bold block">Wheat / Qamadii</span>
-              <span className="text-[10px] text-emerald-200">Bale Durum</span>
-            </div>
-          </div>
-
-          <div className="rounded-2xl overflow-hidden border border-gray-200 relative group">
-            <img src="/images/crops/barley.jpg" alt="Barley" className="w-full h-32 object-cover group-hover:scale-105 transition-transform" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
-            <div className="absolute bottom-2 left-3 right-3 text-white">
-              <span className="text-xs font-bold block">Barley / Garbuu</span>
-              <span className="text-[10px] text-emerald-200">Highland Malt</span>
-            </div>
-          </div>
-        </div>
+        ))}
       </section>
 
-    </div>
+      <section className="grid gap-8 rounded-[1.75rem] bg-[#e8f1df] p-7 sm:p-10 lg:grid-cols-[1fr_auto] lg:items-center">
+        <div>
+          <div className="flex items-center gap-2 text-[#286344]"><ShieldCheck className="h-5 w-5" /><span className="text-xs font-bold uppercase tracking-[0.16em]">Start with what matters</span></div>
+          <h2 className="mt-4 max-w-2xl text-3xl font-semibold tracking-[-0.04em] text-[#123b2b] sm:text-4xl">A professional operating layer for every growing season.</h2>
+          <p className="mt-3 max-w-xl text-sm leading-6 text-[#5c7261]">Create your account, add your first farm, and build a reliable record of the decisions that move your harvest forward.</p>
+        </div>
+        <Link href="/auth/register" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#123b2b] px-6 py-3.5 text-sm font-bold text-white transition-colors hover:bg-[#286344]">Create your account <ArrowUpRight className="h-4 w-4" /></Link>
+      </section>
+    </main>
   );
 }
