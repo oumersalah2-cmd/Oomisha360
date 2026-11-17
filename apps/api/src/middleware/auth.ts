@@ -168,6 +168,10 @@ export async function optionalAuth(req: Request, res: Response, next: NextFuncti
  * Verifies that the incoming request is from the authenticated Telegram Bot via secret API Key.
  */
 export function requireBotApiKey(req: Request, res: Response, next: NextFunction): void {
+  if (!config.telegramBotApiKey) {
+    return next(new UnauthorizedError('Telegram Bot API authentication is not configured.'));
+  }
+
   const apiKey = req.headers['x-bot-api-key'] || req.headers['authorization'];
 
   if (!apiKey) {

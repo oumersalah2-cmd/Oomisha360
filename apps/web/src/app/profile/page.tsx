@@ -18,14 +18,14 @@ import {
 
 export default function UserProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [fullName, setFullName] = useState("Abebe Demisse");
-  const [phone, setPhone] = useState("+251 91 123 4567");
-  const [region, setRegion] = useState("Oromia");
-  const [zone, setZone] = useState("Bale");
-  const [woreda, setWoreda] = useState("Goba");
-  const [cooperativeName, setCooperativeName] = useState("Bale Agricultural Cooperative Union");
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [region, setRegion] = useState("");
+  const [zone, setZone] = useState("");
+  const [woreda, setWoreda] = useState("");
+  const [cooperativeName, setCooperativeName] = useState("");
   const [role, setRole] = useState<UserProfile["role"]>("farmer");
-  const [demoActive, setDemoActive] = useState(true);
+  const [demoActive, setDemoActive] = useState(false);
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
   const router = useRouter();
 
@@ -44,7 +44,7 @@ export default function UserProfilePage() {
         setProfile(p);
         setFullName(p.fullName);
         setPhone(p.phone || "");
-        setRegion(p.region || "Oromia");
+        setRegion(p.region || "");
         setZone(p.zone || "");
         setWoreda(p.woreda || "");
         setCooperativeName(p.cooperativeName || "");

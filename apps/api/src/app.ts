@@ -30,15 +30,14 @@ export function createApp(): Express {
   // CORS Configuration
   const allowedOrigins = [
     config.frontendUrl,
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-  ];
+    ...(config.isProduction ? [] : ['http://localhost:3000', 'http://127.0.0.1:3000']),
+  ].filter(Boolean);
 
   app.use(
     cors({
       origin: (origin, callback) => {
         // Allow requests with no origin (like mobile apps, curl, or server-to-server)
-        if (!origin || allowedOrigins.includes(origin) || origin.startsWith('http://localhost:')) {
+        if (!origin || allowedOrigins.includes(origin)) {
           callback(null, true);
         } else {
           callback(new Error(`Origin ${origin} not permitted by CORS`));

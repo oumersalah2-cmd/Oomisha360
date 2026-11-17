@@ -29,7 +29,10 @@ export function sanitizeDbError(msg: string): string {
 
 // Check whether a real PostgreSQL DATABASE_URL is provided (not empty and not the default template)
 export const isConfiguredWithRealDatabase = Boolean(
-  config.databaseUrl && !config.databaseUrl.includes('your-db-password') && !config.databaseUrl.includes('db.supabase.co:5432')
+  config.nodeEnv !== 'test' &&
+    config.databaseUrl &&
+    !config.databaseUrl.includes('your-db-password') &&
+    !config.databaseUrl.includes('[PASSWORD]')
 );
 
 if (isConfiguredWithRealDatabase) {

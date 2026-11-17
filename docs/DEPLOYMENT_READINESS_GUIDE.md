@@ -104,7 +104,7 @@ JWT_SECRET=<generated-64-character-random-hex>
    - Connect GitHub repo.
    - Root Directory: `apps/api`.
    - Build Command: `npm install && npm run build --workspace=packages/shared && npm run build:api`.
-   - Start Command: `node dist/index.js` or `npm run start --workspace=apps/api`.
+   - Start Command: `node dist/server.js` or `npm run start --workspace=apps/api`.
    - Set environment variables (`NODE_ENV=production`, `DATABASE_URL`, `CORS_ORIGIN`, `SUPABASE_URL`, etc.).
 
 ---
@@ -132,7 +132,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
 EXPOSE 5000
-CMD ["node", "apps/api/dist/index.js"]
+CMD ["node", "apps/api/dist/server.js"]
 ```
 
 ---

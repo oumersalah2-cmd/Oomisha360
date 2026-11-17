@@ -19,7 +19,6 @@ import {
   PolygonCalculationInput,
   calculateRectangularArea,
   calculatePolygonArea,
-  calculateFinanceSummary,
   CropProtectionProduct,
   CropProtectionListing,
   CropProtectionGuidanceResult,
@@ -56,8 +55,8 @@ export const clearAuthSession = () => {
 };
 
 export const isDemoMode = (): boolean => {
-  if (typeof window === 'undefined') return true;
-  return localStorage.getItem('gebere_demo_mode') !== 'false';
+  if (typeof window === 'undefined') return false;
+  return localStorage.getItem('gebere_demo_mode') === 'true';
 };
 
 export const setDemoMode = (enabled: boolean) => {
@@ -100,127 +99,6 @@ async function apiRequest<T>(
   }
 }
 
-// Fallback seed data for pure offline demonstration
-const fallbackFarms: Farm[] = [
-  {
-    id: 'farm-adaa-teff',
-    userId: 'usr-demo-farmer-1',
-    name: 'Bishoftu Volcanic Black Soil Plot',
-    region: 'Oromia',
-    zone: 'East Shewa',
-    woreda: 'Bishoftu',
-    kebele: 'Ude Kebele',
-    soilType: 'Vertisol (Black Cotton Soil)',
-    totalHectares: 3.5,
-    primaryCrop: 'White Teff (Magna)',
-    notes: 'Well-drained fertile volcanic plain, rotated with chickpeas in dry season.',
-    createdAt: '2026-02-01T10:00:00Z',
-    updatedAt: '2026-02-01T10:00:00Z',
-  },
-  {
-    id: 'farm-bale-wheat',
-    userId: 'usr-demo-farmer-1',
-    name: 'Bale Highlands Durum Wheat Block',
-    region: 'Oromia',
-    zone: 'Bale',
-    woreda: 'Goba',
-    kebele: 'Sinana Kebele',
-    soilType: 'Clay Loam',
-    totalHectares: 5.0,
-    primaryCrop: 'Durum Wheat',
-    notes: 'Highland altitude 2,400m, high yield potential for pasta millers.',
-    createdAt: '2026-02-15T09:30:00Z',
-    updatedAt: '2026-02-15T09:30:00Z',
-  },
-];
-
-const fallbackExpenses: Expense[] = [
-  {
-    id: 'exp-1',
-    userId: 'usr-demo-farmer-1',
-    farmId: 'farm-adaa-teff',
-    season: '2026 Meher',
-    category: 'land_preparation',
-    description: 'Tractor plowing (oxen + chisel plow)',
-    amount: 8500,
-    currency: 'ETB',
-    date: '2026-05-10',
-    createdAt: '2026-05-10T08:00:00Z',
-    updatedAt: '2026-05-10T08:00:00Z',
-  },
-  {
-    id: 'exp-2',
-    userId: 'usr-demo-farmer-1',
-    farmId: 'farm-adaa-teff',
-    season: '2026 Meher',
-    category: 'seeds',
-    description: 'Certified Magna Teff seed 40kg',
-    amount: 6200,
-    currency: 'ETB',
-    date: '2026-05-25',
-    createdAt: '2026-05-25T09:00:00Z',
-    updatedAt: '2026-05-25T09:00:00Z',
-  },
-  {
-    id: 'exp-3',
-    userId: 'usr-demo-farmer-1',
-    farmId: 'farm-adaa-teff',
-    season: '2026 Meher',
-    category: 'fertilizer',
-    description: 'NPSB and Urea blended fertilizer (4 bags)',
-    amount: 14800,
-    currency: 'ETB',
-    date: '2026-06-12',
-    createdAt: '2026-06-12T10:00:00Z',
-    updatedAt: '2026-06-12T10:00:00Z',
-  },
-  {
-    id: 'exp-4',
-    userId: 'usr-demo-farmer-1',
-    farmId: 'farm-adaa-teff',
-    season: '2026 Meher',
-    category: 'labor',
-    description: 'Weeding crew (3 days, 6 persons)',
-    amount: 9000,
-    currency: 'ETB',
-    date: '2026-07-15',
-    createdAt: '2026-07-15T11:00:00Z',
-    updatedAt: '2026-07-15T11:00:00Z',
-  },
-  {
-    id: 'exp-5',
-    userId: 'usr-demo-farmer-1',
-    farmId: 'farm-adaa-teff',
-    season: '2026 Meher',
-    category: 'transportation',
-    description: 'Transport from field to Ada\'a cooperative storehouse',
-    amount: 4500,
-    currency: 'ETB',
-    date: '2026-10-20',
-    createdAt: '2026-10-20T14:00:00Z',
-    updatedAt: '2026-10-20T14:00:00Z',
-  },
-];
-
-const fallbackHarvests: Harvest[] = [
-  {
-    id: 'hrv-1',
-    userId: 'usr-demo-farmer-1',
-    farmId: 'farm-adaa-teff',
-    crop: 'White Teff (Magna)',
-    season: '2026 Meher',
-    harvestDate: '2026-10-18',
-    quantity: 38,
-    unit: 'Quintals',
-    sellingPricePerUnit: 6800,
-    currency: 'ETB',
-    buyerName: 'Ada\'a Union Millers',
-    notes: 'Excellent grain purity, moisture level 10.8%.',
-    createdAt: '2026-10-19T10:00:00Z',
-    updatedAt: '2026-10-19T10:00:00Z',
-  },
-];
-
 export const apiClient = {
   // 1. Health
   async getHealth() {
@@ -236,13 +114,13 @@ export const apiClient = {
   async getFarms(): Promise<Farm[]> {
     const res = await apiRequest<Farm[]>('/farms');
     if (res.success && res.data) return res.data;
-    return fallbackFarms;
+    return [];
   },
 
   async getFarm(farmId: string): Promise<Farm | null> {
     const res = await apiRequest<Farm>(`/farms/${farmId}`);
     if (res.success && res.data) return res.data;
-    return fallbackFarms.find((f) => f.id === farmId) || null;
+    return null;
   },
 
   async createFarm(farm: Omit<Farm, 'id' | 'userId' | 'createdAt' | 'updatedAt'>): Promise<Farm> {
@@ -329,9 +207,7 @@ export const apiClient = {
 
     const res = await apiRequest<Expense[]>(`/expenses${query}`);
     if (res.success && res.data) return res.data;
-    return fallbackExpenses.filter(
-      (e) => (!farmId || e.farmId === farmId) && (!season || e.season === season)
-    );
+    return [];
   },
 
   async createExpense(expense: Omit<Expense, 'id' | 'userId' | 'createdAt' | 'updatedAt'>): Promise<Expense> {
@@ -359,9 +235,7 @@ export const apiClient = {
 
     const res = await apiRequest<Harvest[]>(`/harvests${query}`);
     if (res.success && res.data) return res.data;
-    return fallbackHarvests.filter(
-      (h) => (!farmId || h.farmId === farmId) && (!season || h.season === season)
-    );
+    return [];
   },
 
   async createHarvest(harvest: Omit<Harvest, 'id' | 'userId' | 'createdAt' | 'updatedAt'>): Promise<Harvest> {
@@ -390,16 +264,7 @@ export const apiClient = {
     const res = await apiRequest<FinanceSummary>(`/finance/summary${query}`);
     if (res.success && res.data) return res.data;
 
-    // Fallback calculation
-    const farm = fallbackFarms.find((f) => f.id === farmId) || fallbackFarms[0];
-    return calculateFinanceSummary(
-      fallbackExpenses.filter((e) => !farmId || e.farmId === farmId),
-      fallbackHarvests.filter((h) => !farmId || h.farmId === farmId),
-      farm ? farm.totalHectares : 3.5,
-      'ETB',
-      farmId,
-      season
-    );
+    throw new Error(res.error?.message || 'Failed to load finance summary from the API.');
   },
 
   // 7. Marketplace
@@ -464,32 +329,14 @@ export const apiClient = {
       };
     }
 
-    return {
-      status: 'service_interface_ready',
-      botUsername: 'gebere_vision_bot',
-      notice:
-        'Live computer-vision disease diagnosis is actively serviced through the Gebere Vision Telegram Bot (@gebere_vision_bot). Web camera and browser file diagnosis interface is prepared and will connect directly in the next release.',
-      supportedBotCrops: ['Coffee (Arabica)', 'Wheat (Durum & Bread)', 'Teff (Magna & Red)', 'Maize', 'Sorghum'],
-    };
+    throw new Error(res.error?.message || 'Failed to load crop health service status.');
   },
 
   // 9. Profile
   async getProfile(): Promise<UserProfile | null> {
     const res = await apiRequest<UserProfile>('/profiles/me');
     if (res.success && res.data) return res.data;
-    return {
-      id: 'usr-demo-farmer-1',
-      email: 'farmer.demo@geberevision.et',
-      fullName: 'Abebe Demisse',
-      phone: '+251 91 123 4567',
-      region: 'Oromia',
-      zone: 'East Shewa',
-      woreda: 'Bishoftu (Ada\'a)',
-      cooperativeName: 'Ada\'a Agricultural Cooperative',
-      role: 'farmer',
-      createdAt: '2026-01-10T08:00:00Z',
-      updatedAt: '2026-01-10T08:00:00Z',
-    };
+    return null;
   },
 
   async updateProfile(updates: Partial<UserProfile>): Promise<UserProfile | null> {
@@ -682,5 +529,3 @@ export const apiClient = {
     return { success: false, error: res.error?.message || 'Failed to submit inquiry' };
   },
 };
-
-

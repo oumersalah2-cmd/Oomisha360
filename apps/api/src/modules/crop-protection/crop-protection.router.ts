@@ -21,55 +21,59 @@ cropProtectionRouter.get('/products', optionalAuth, async (req: Request, res: Re
     const { crop, category, query, registrationStatus } = req.query;
 
     if (isUsingPrisma && prisma) {
-      const whereClause: Record<string, unknown> = {};
+      try {
+        const whereClause: Record<string, unknown> = {};
 
-      if (category && category !== 'all') {
-        whereClause.category = String(category);
-      }
-      if (registrationStatus && registrationStatus !== 'all') {
-        whereClause.registrationStatus = String(registrationStatus);
-      }
-      if (crop && crop !== 'all') {
-        const cropStr = String(crop);
-        whereClause.supportedCrops = { has: cropStr };
-      }
-      if (query) {
-        const q = String(query);
-        whereClause.OR = [
-          { tradeName: { contains: q, mode: 'insensitive' } },
-          { brandName: { contains: q, mode: 'insensitive' } },
-          { activeIngredient: { contains: q, mode: 'insensitive' } },
-          { registrationNumber: { contains: q, mode: 'insensitive' } },
-          { targetPests: { hasSome: [q] } },
-        ];
-      }
+        if (category && category !== 'all') {
+          whereClause.category = String(category);
+        }
+        if (registrationStatus && registrationStatus !== 'all') {
+          whereClause.registrationStatus = String(registrationStatus);
+        }
+        if (crop && crop !== 'all') {
+          const cropStr = String(crop);
+          whereClause.supportedCrops = { has: cropStr };
+        }
+        if (query) {
+          const q = String(query);
+          whereClause.OR = [
+            { tradeName: { contains: q, mode: 'insensitive' } },
+            { brandName: { contains: q, mode: 'insensitive' } },
+            { activeIngredient: { contains: q, mode: 'insensitive' } },
+            { registrationNumber: { contains: q, mode: 'insensitive' } },
+            { targetPests: { hasSome: [q] } },
+          ];
+        }
 
-      const products = await prisma.cropProtectionProduct.findMany({
-        where: whereClause,
-        include: {
-          approvedUses: true,
-          listings: {
-            where: { status: 'active' },
-            select: { priceAmount: true },
+        const products = await prisma.cropProtectionProduct.findMany({
+          where: whereClause,
+          include: {
+            approvedUses: true,
+            listings: {
+              where: { status: 'active' },
+              select: { priceAmount: true },
+            },
           },
-        },
-        orderBy: { tradeName: 'asc' },
-      });
+          orderBy: { tradeName: 'asc' },
+        });
 
-      // Enhance with min price and listing counts
-      const mapped = products.map((p: any) => {
-        const prices = p.listings.map((l: any) => l.priceAmount);
-        const minPrice = prices.length > 0 ? Math.min(...prices) : undefined;
-        return {
-          ...p,
-          minPriceAmount: minPrice,
-          listingCount: p.listings.length,
-          listings: undefined, // keep summary clean
-        };
-      });
+        // Enhance with min price and listing counts
+        const mapped = products.map((p: any) => {
+          const prices = p.listings.map((l: any) => l.priceAmount);
+          const minPrice = prices.length > 0 ? Math.min(...prices) : undefined;
+          return {
+            ...p,
+            minPriceAmount: minPrice,
+            listingCount: p.listings.length,
+            listings: undefined, // keep summary clean
+          };
+        });
 
-      res.json({ success: true, data: mapped, total: mapped.length });
-      return;
+        res.json({ success: true, data: mapped, total: mapped.length });
+        return;
+      } catch (dbErr: any) {
+        console.warn('[CROP-PROTECTION] Remote database query error, serving in-memory catalogue:', dbErr?.message);
+      }
     }
 
     // In-memory fallback
@@ -123,23 +127,28 @@ cropProtectionRouter.get('/products/:id', optionalAuth, async (req: Request, res
     const id = req.params.id as string;
 
     if (isUsingPrisma && prisma) {
-      const product = await prisma.cropProtectionProduct.findUnique({
-        where: { id },
-        include: {
-          approvedUses: true,
-          listings: {
-            where: { status: 'active' },
-            orderBy: { priceAmount: 'asc' },
+      try {
+        const product = await prisma.cropProtectionProduct.findUnique({
+          where: { id },
+          include: {
+            approvedUses: true,
+            listings: {
+              where: { status: 'active' },
+              orderBy: { priceAmount: 'asc' },
+            },
           },
-        },
-      });
+        });
 
-      if (!product) {
-        throw new NotFoundError(`Crop protection product '${id}' not found`);
+        if (!product) {
+          throw new NotFoundError(`Crop protection product '${id}' not found`);
+        }
+
+        res.json({ success: true, data: product });
+        return;
+      } catch (dbErr: any) {
+        if (dbErr instanceof NotFoundError) throw dbErr;
+        console.warn('[CROP-PROTECTION] Remote database error for product detail, using in-memory store:', dbErr?.message);
       }
-
-      res.json({ success: true, data: product });
-      return;
     }
 
     const product = inMemoryStore.cropProtectionProducts.get(id);
@@ -185,33 +194,38 @@ cropProtectionRouter.get('/guidance', optionalAuth, async (req: Request, res: Re
     let matchingProducts: CropProtectionProduct[] = [];
 
     if (isUsingPrisma && prisma) {
-      const products = await prisma.cropProtectionProduct.findMany({
-        where: {
-          supportedCrops: { has: normalizedCrop },
-        },
-        include: {
-          approvedUses: true,
-          listings: { where: { status: 'active' }, select: { priceAmount: true } },
-        },
-      });
-
-      matchingProducts = products
-        .map((p: any) => {
-          const prices = p.listings.map((l: any) => l.priceAmount);
-          return {
-            ...p,
-            minPriceAmount: prices.length > 0 ? Math.min(...prices) : undefined,
-            listingCount: p.listings.length,
-          };
-        })
-        .filter((p: CropProtectionProduct) => {
-          if (!problem) return true;
-          const prob = problem.toLowerCase();
-          const matchesTarget = p.targetPests.some((pest) => pest.toLowerCase().includes(prob));
-          const matchesUse = p.approvedUses?.some((u) => u.targetProblem.toLowerCase().includes(prob));
-          return matchesTarget || matchesUse;
+      try {
+        const products = await prisma.cropProtectionProduct.findMany({
+          where: {
+            supportedCrops: { has: normalizedCrop },
+          },
+          include: {
+            approvedUses: true,
+            listings: { where: { status: 'active' }, select: { priceAmount: true } },
+          },
         });
-    } else {
+
+        matchingProducts = products
+          .map((p: any) => {
+            const prices = p.listings.map((l: any) => l.priceAmount);
+            return {
+              ...p,
+              minPriceAmount: prices.length > 0 ? Math.min(...prices) : undefined,
+              listingCount: p.listings.length,
+            };
+          })
+          .filter((p: CropProtectionProduct) => {
+            if (!problem) return true;
+            const prob = problem.toLowerCase();
+            const matchesTarget = p.targetPests.some((pest) => pest.toLowerCase().includes(prob));
+            const matchesUse = p.approvedUses?.some((u) => u.targetProblem.toLowerCase().includes(prob));
+            return matchesTarget || matchesUse;
+          });
+      } catch (dbErr: any) {
+        console.warn('[CROP-PROTECTION] Remote database error for guidance, using in-memory store:', dbErr?.message);
+      }
+    }
+    if (matchingProducts.length === 0) {
       const products = Array.from(inMemoryStore.cropProtectionProducts.values()).filter((p) =>
         p.supportedCrops.some((c) => c.toLowerCase() === normalizedCrop.toLowerCase())
       );
@@ -260,51 +274,55 @@ cropProtectionRouter.get('/listings', optionalAuth, async (req: Request, res: Re
     const userId = req.user?.id;
 
     if (isUsingPrisma && prisma) {
-      const whereClause: Record<string, unknown> = {};
+      try {
+        const whereClause: Record<string, unknown> = {};
 
-      if (myOnly === 'true' && userId) {
-        whereClause.supplierId = userId;
-      } else {
-        whereClause.status = status ? String(status) : 'active';
-      }
+        if (myOnly === 'true' && userId) {
+          whereClause.supplierId = userId;
+        } else {
+          whereClause.status = status ? String(status) : 'active';
+        }
 
-      if (productId) {
-        whereClause.productId = String(productId);
-      }
-      if (region && region !== 'all') {
-        whereClause.region = { contains: String(region), mode: 'insensitive' };
-      }
-      if (zone && zone !== 'all') {
-        whereClause.zone = { contains: String(zone), mode: 'insensitive' };
-      }
-      if (woreda && woreda !== 'all') {
-        whereClause.woreda = { contains: String(woreda), mode: 'insensitive' };
-      }
-      if (inStockOnly === 'true') {
-        whereClause.inStock = true;
-      }
+        if (productId) {
+          whereClause.productId = String(productId);
+        }
+        if (region && region !== 'all') {
+          whereClause.region = { contains: String(region), mode: 'insensitive' };
+        }
+        if (zone && zone !== 'all') {
+          whereClause.zone = { contains: String(zone), mode: 'insensitive' };
+        }
+        if (woreda && woreda !== 'all') {
+          whereClause.woreda = { contains: String(woreda), mode: 'insensitive' };
+        }
+        if (inStockOnly === 'true') {
+          whereClause.inStock = true;
+        }
 
-      const listings = await prisma.cropProtectionListing.findMany({
-        where: whereClause,
-        include: {
-          product: {
-            select: {
-              id: true,
-              tradeName: true,
-              brandName: true,
-              activeIngredient: true,
-              category: true,
-              whoToxicityClass: true,
-              registrationNumber: true,
-              registrationStatus: true,
+        const listings = await prisma.cropProtectionListing.findMany({
+          where: whereClause,
+          include: {
+            product: {
+              select: {
+                id: true,
+                tradeName: true,
+                brandName: true,
+                activeIngredient: true,
+                category: true,
+                whoToxicityClass: true,
+                registrationNumber: true,
+                registrationStatus: true,
+              },
             },
           },
-        },
-        orderBy: { priceAmount: 'asc' },
-      });
+          orderBy: { priceAmount: 'asc' },
+        });
 
-      res.json({ success: true, data: listings, total: listings.length });
-      return;
+        res.json({ success: true, data: listings, total: listings.length });
+        return;
+      } catch (dbErr: any) {
+        console.warn('[CROP-PROTECTION] Remote database error for listings, using in-memory store:', dbErr?.message);
+      }
     }
 
     let listings = Array.from(inMemoryStore.cropProtectionListings.values());
